@@ -1,0 +1,76 @@
+@mixin before-test-aligning-to-baseline {
+  $p-fonteque: ("test": ("family": sans-serif, "cap-height": 0.72)) !global;
+}
+
+@include before-test-aligning-to-baseline;
+
+@include test-module("p-shift-value [function]") {
+  @include test("Should return distance to shift text down.") {
+    $to: 100px;
+    $cap-height: map-get(map-get($p-fonteque, "test"), "cap-height") * 1em;
+    $output: p-shift-value($to, $cap-height);
+    $expect: 1.25rem;
+
+    @include assert-equal($output, $expect);
+  }
+}
+
+@include test-module("p-fonteque-get [mixin]") {
+  @include test("Should output styles rules of `$key`'s family font.") {
+    @include assert {
+      @include output {
+        @include p-fonteque-get("test");
+      }
+
+      @include expect {
+        font-family: sans-serif;
+      }
+    }
+  }
+
+  @include test("Should output fallback's styles rules") {
+    @include assert {
+      @include output {
+        @include p-fonteque-get("if-it-does-not-exist", ("style": "normal"));
+      }
+
+      @include expect {
+        font-style: normal;
+      }
+    }
+  }
+}
+
+@include test-module("p-adjust-padding-leader [mixin]") {
+  @include test("Should output correct padding-top to move the text downwards.") {
+    @include assert {
+      @include output {
+        $to: 100px;
+        $font: "test";
+
+        @include p-adjust-padding-leader($to, $font);
+      }
+
+      @include expect {
+        padding-top: 1.25rem;
+      }
+    }
+  }
+}
+
+@include test-module("p-adjust-trailing-whitespace [mixin]") {
+  @include test("Should output correct margin-bottom to fix vertical rhythm for elements below.") {
+    @include assert {
+      @include output {
+        $to: 100px;
+        $font: "test";
+
+        @include p-adjust-trailing-whitespace($to, $font);
+      }
+
+      @include expect {
+        margin-bottom: 1.75rem;
+      }
+    }
+  }
+}

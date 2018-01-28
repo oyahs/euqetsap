@@ -1,0 +1,20 @@
+{
+  "serve": {
+    "_": "serve"
+  },
+  "style": {
+    "_": "style",
+    "sass": {
+      "options": {
+        "outputStyle": "expanded",
+        "precision": 10
+      }
+    }
+  },
+  "rev": {
+    "_": "rev",
+    "options": {
+      "merge": true
+    }
+  }
+}

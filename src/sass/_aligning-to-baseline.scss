@@ -1,0 +1,149 @@
+////
+//// @author zaza/pasteque
+//// @group aligning-to-baseline
+//// @link https://medium.com/written-in-code/aligning-type-to-baseline-the-right-way-using-sass-e258fce47a9b
+////
+
+/// Calculate distance to shift text down.
+/// @access private
+/// @example
+///   p-shift-value(16px, 0.72em);
+/// @parameter {Number} $to
+/// @parameter {Number} $cap-height
+/// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
+/// @return {Number} Distance to shift text down.
+@function p-shift-value($to, $cap-height, $from: null) {
+  @if (type-of($from) != "number") {
+    $from: p-get("BROWSER_DEFAULT_FONT_SIZE");
+  }
+
+  $to: p-convert-length($to, "px", $from);
+  $lines: p-lines-for-font-size($to);
+  $line-height: p-rhythm($lines, 0, $from);
+  $to: p-convert-length($to, $p-unit-global, $from);
+  $cap-height: p-convert-length($cap-height, $p-unit-global, $from);
+  $from: p-convert-length($from, $p-unit-global);
+  $_return: $to / 2 * ($line-height * $from / $to - $cap-height) / $from;
+
+  @if (unit($_return) == "px") {
+    $_return: floor($_return);
+  }
+
+  @return $_return;
+}
+
+/// Apply leading whitespace as padding to align to baseline.
+/// @example
+///   @include p-adjust-padding-leader(16px, "heading");
+/// @parameter {Number} $to
+/// @parameter {String} $font - Font's key to get.
+/// @parameter {Number} $lines [0] - Multiples of baseline rhythm to apply as leading padding.
+/// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
+@mixin p-adjust-padding-leader($to, $font, $lines: 0, $from: null) {
+  @if (map-has-key($p-fonteque, $font)) {
+    @if (unitless($to)) {
+      $to: p-ts($to);
+    }
+
+    @if (type-of($from) == "number" and unitless($from)) {
+      $from: p-ts($from);
+    }
+
+    $cap-height: map-get(map-get($p-fonteque, $font), "cap-height") * 1em;
+    $shift-value: p-shift-value($to, $cap-height, $from);
+
+    @if (not unitless($lines)) {
+      $lines: _p-lines-for($lines);
+    }
+
+    $leader: p-rhythm($lines, 0, $from);
+
+    @include _p-rem("padding-top", $shift-value + $leader);
+  }
+  @else {
+    @warn "$p-fonteque has no `#{$font}` font. Output ø.";
+  }
+}
+
+/// Apply trailing whitespace to align to baseline.
+/// @example
+///   @include p-adjust-trailing-whitespace(16px, "heading");
+/// @parameter {Number} $to
+/// @parameter {String} $font - Font's key to get.
+/// @parameter {Number} $lines [0] - Multiples of baseline rhythm to apply as trailing whitespace.
+/// @parameter {String} $property ["margin"] - Can be margin or padding.
+/// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
+@mixin p-adjust-trailing-whitespace($to, $font, $lines: 0, $property: "margin", $from: null) {
+  @if (map-has-key($p-fonteque, $font)) {
+    @if (unitless($to)) {
+      $to: p-ts($to);
+    }
+
+    @if (type-of($from) == "number" and unitless($from)) {
+      $from: p-ts($from);
+    }
+
+    $cap-height: map-get(map-get($p-fonteque, $font), "cap-height") * 1em;
+    $_shift-value: p-shift-value($to, $cap-height, $from);
+    $reference: p-rhythm(1, 0, $from);
+
+    @if (not unitless($lines)) {
+      $lines: _p-lines-for($lines);
+    }
+
+    $trailer: p-rhythm($lines, 0, $from) + $reference;
+    $_trailer: 0;
+
+    @if ($_shift-value > $trailer) {
+      $shift-to-px: p-convert-length($_shift-value, "px", $from);
+      $lines-for-shift: _p-lines-for($shift-to-px);
+      $_trailer: p-rhythm($lines-for-shift, 0, $from);
+    }
+
+    $shift-value: ($trailer + $_trailer) - $_shift-value;
+
+    @include _p-rem("#{$property}-bottom", $shift-value);
+
+    @if ($property == "margin" and $reference > $shift-value) {
+      & + * { // stylelint-disable-line scss/selector-no-redundant-nesting-selector
+        margin-top: 0;
+      }
+    }
+  }
+  @else {
+    @warn "$p-fonteque has no `#{$font}` font. Output ø.";
+  }
+}
+
+/// Adjust a text to have a different font size and line height to maintain the rhythm and align it to baseline.
+/// @example
+///   @include type-to-baseline(16px, "heading");
+/// @parameter {Number} $to
+/// @parameter {Null|String} $font [null] - Font's key to get.
+/// @parameter {Number} $leader [0] - Multiples of baseline rhythm to apply as leading padding.
+/// @parameter {Number} $trailer [$trailer] - Multiples of baseline rhythm to apply as trailing margin.
+/// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
+@mixin type-to-baseline($to, $font: null, $leader: 0, $trailer: $leader, $from: null) {
+  @include p-font-size($to, $from);
+
+  @if (map-has-key($p-fonteque, $font)) {
+    @include p-adjust-padding-leader($to, $font, $leader, $from);
+    @include p-adjust-trailing-whitespace($to, $font, $trailer, "margin", $from);
+  }
+}
+
+/// Adjust a block to have a different font size and line height to maintain the rhythm and align it to baseline.
+/// @example
+///   @include p-aligning-component-to-baseline(16px, "button");
+/// @parameter {Number} $to
+/// @parameter {Null|String} $font [null] - Font's key to get.
+/// @parameter {Number} $lines [0] - Multiples of baseline rhythm to apply for top and bottom padding.
+/// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
+@mixin component-to-baseline($to, $font: null, $lines: 0, $from: null) {
+  @include p-font-size($to, $from);
+
+  @if (map-has-key($p-fonteque, $font)) {
+    @include p-adjust-padding-leader($to, $font, $lines, $from);
+    @include p-adjust-trailing-whitespace($to, $font, $lines, "padding", $from);
+  }
+}

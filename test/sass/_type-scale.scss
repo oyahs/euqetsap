@@ -1,0 +1,42 @@
+@mixin before-test-type-scale {
+  $p-type-scale-base: 16px !global;
+  $p-type-scale-ratio: 1.5 !global;
+}
+
+@include before-test-type-scale;
+
+@include test-module("p-ts [function]") {
+  @include test("Should return default base scale.") {
+    $i: 0;
+    $output: p-ts($i);
+    $expect: $p-type-scale-base;
+
+    @include assert-equal($output, $expect);
+  }
+
+  @include test("Should return lower value than default scale w/ negative integer `$i`.") {
+    $i: -5;
+    $output: p-ts($i);
+    $expect: 2px;
+
+    @include assert-equal($output, $expect);
+  }
+
+  @include test("Should return new `$base` assigned value.") {
+    $base: 10px;
+    $output: p-ts($base: $base);
+    $expect: $p-type-scale-base;
+
+    @include assert-unequal($output, $expect);
+  }
+
+  @include test("Should return 2^2 value.") {
+    $i: 1;
+    $base: 2;
+    $ratio: 2;
+    $output: p-ts($i, $base, $ratio);
+    $expect: 4px;
+
+    @include assert-equal($output, $expect);
+  }
+}

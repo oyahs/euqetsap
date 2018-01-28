@@ -1,0 +1,12 @@
+# tasks
+task/
+
+# devDependencies config files
+.babelrc
+.stylelintrc.json
+browserslist
+mawqie.json
+postcss.config.js
+
+# tests
+test/

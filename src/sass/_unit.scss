@@ -1,0 +1,210 @@
+/// The length unit in which to output rhythm values. Supported values: `px`, `em`, `rem`.
+/// @author compass/typography
+/// @group vertical-rhythm
+/// @link http://compass-style.org/reference/compass/typography/
+/// @type String
+$p-unit-global: "rem" !default;
+
+/// Convert any CSS `length` or `percentage` value to any another.
+/// @author compass/typography
+/// @example
+///   p-convert-length(16px, "rem");
+/// @example
+///   p-convert-length(16px, "em", 14px);
+/// @group unit
+/// @link http://compass-style.org/reference/compass/typography/
+/// @parameter {Number} $length - Css `length` or `percentage` value.
+/// @parameter {String} $unit - String matching a css unit keyword.
+/// @parameter {Null|Number} $from [null] - When converting from relative units, the absolute length (in px) to which `$length` refers.
+/// @return {Number} New converted length.
+@function p-convert-length($length, $unit, $from: null) {
+  $length-unit: unit($length);
+
+  @if ($length-unit == $unit) {
+    @return $length;
+  }
+
+  $browser-default-font-size: p-get("BROWSER_DEFAULT_FONT_SIZE");
+
+  @if (type-of($from) == "number") {
+    @if (unit($from) != "px") {
+      @warn "$from must resolve to a value in px.";
+
+      $from: $browser-default-font-size;
+    }
+  }
+  @else {
+    $from: $browser-default-font-size;
+  }
+
+  $non-convertible-unit: "ch", "vw", "vh", "vmin"; // stylelint-disable-line plugin/no-unsupported-browser-features
+  $length-to-px: $length;
+
+  @if ($length-unit != "px") {
+    @if ($length-unit == "em") {
+      $length-to-px: ($length / 1em) * $from;
+    }
+    @else if ($length-unit == "rem") {
+      $length-to-px: ($length / 1rem) * $browser-default-font-size;
+    }
+    @else if ($length-unit == "%") {
+      $length-to-px: ($length / 100%) * $from;
+    }
+    @else if ($length-unit == "ex") {
+      $length-to-px: ($length / 2ex) * $from;
+    }
+    @else if (index(("in", "mm", "cm", "pt", "pc"), $length-unit) != null) {
+      $length-to-px: 0px + $length; // stylelint-disable-line length-zero-no-unit
+    }
+    @else if (index($non-convertible-unit, $length-unit) != null) {
+      @warn "`#{$length-unit}`'s unit can't be reliably converted. Returning original value.";
+
+      @return $length;
+    }
+    @else {
+      @warn "`#{$length-unit}` is an unknown length unit. Returning original value.";
+
+      @return $length;
+    }
+  }
+
+  $_return: $length-to-px;
+
+  @if ($unit != "px") {
+    @if ($unit == "em") {
+      $_return: ($length-to-px / $from) * 1em;
+    }
+    @else if ($unit == "rem") {
+      $_return: ($length-to-px / $browser-default-font-size) * 1rem;
+    }
+    @else if ($unit == "%") {
+      $_return: ($length-to-px / $from) * 100%;
+    }
+    @else if ($unit == "ex") {
+      $_return: ($length-to-px / $from) * 2ex;
+    }
+    @else if ($unit == "in") {
+      $_return: 0in + $length-to-px; // stylelint-disable-line length-zero-no-unit
+    }
+    @else if ($unit == "mm") {
+      $_return: 0mm + $length-to-px; // stylelint-disable-line length-zero-no-unit
+    }
+    @else if ($unit == "cm") {
+      $_return: 0cm + $length-to-px; // stylelint-disable-line length-zero-no-unit
+    }
+    @else if ($unit == "pt") {
+      $_return: 0pt + $length-to-px; // stylelint-disable-line length-zero-no-unit
+    }
+    @else if ($unit == "pc") {
+      $_return: 0pc + $length-to-px; // stylelint-disable-line length-zero-no-unit
+    }
+    @else if (index($non-convertible-unit, $unit) != null) {
+      @warn "`#{$unit}`'s unit can't be reliably converted. Returning px value.";
+
+      @return $length-to-px;
+    }
+    @else {
+      @warn "`#{$unit}` is an unknown length unit. Returning px value.";
+
+      @return $length-to-px;
+    }
+  }
+
+  @return $_return;
+}
+
+/// Get the px/rem versions of a value.
+/// @access private
+/// @alias p-px-rem
+/// @author compass/typography
+/// @example
+///   _px-rem(19px);
+/// @group unit
+/// @link http://compass-style.org/reference/compass/typography/
+/// @parameter {Number} $value
+/// @return {Map} px/rem versions
+@function _p-px-rem($value) {
+  $_return: ("px": $value, "rem": $value);
+
+  @if (type-of($value) == "number" and not unitless($value)) {
+    $value-unit: unit($value);
+
+    @if ($value-unit == "rem") {
+      $_this: p-convert-length($value, "px");
+      $_return: map-merge($_return, ("px": round($_this)));
+    }
+    @else if ($value-unit == "px") {
+      $_this: p-convert-length($value, "rem");
+      $_return: map-merge($_return, ("px": round($value), "rem": $_this));
+    }
+  }
+
+  @return $_return;
+}
+
+/// Get the px/rem versions of a list (or nested lists).
+/// @access private
+/// @author compass/typography
+/// @example
+///   p-px-rem((19px, 21px));
+/// @group unit
+/// @link http://compass-style.org/reference/compass/typography/
+/// @parameter {List|Number} $value
+/// @return {Map} px/rem versions
+@function p-px-rem($value) {
+  $_return: ("px": (), "rem": ());
+
+  @if (type-of($value) == "list") {
+    $separator: list-separator($value);
+
+    @each $sub in $value {
+      $_this: p-px-rem($sub);
+      $_return: ("px": append(map-get($_return, "px"), map-get($_this, "px"), $separator), "rem": append(map-get($_return, "rem"), map-get($_this, "rem"), $separator),);
+    }
+  }
+  @else {
+    $_this: _p-px-rem($value);
+    $_return: map-merge($_return, $_this);
+  }
+
+  @return $_return;
+}
+
+/// Output a given style rule containing rem values along with an (optional) fallback rule for older browsers.
+/// @access private
+/// @alias p-rem
+/// @author compass/typography
+/// @example
+///   @include _p-rem("font-size", 16px);
+/// @group unit
+/// @link http://compass-style.org/reference/compass/typography/
+/// @parameter {String} $property - Css property name.
+/// @parameter {List|Number} $value - Value or list of values for the property.
+@mixin _p-rem($property, $value) {
+  $map: p-px-rem($value);
+  $px-get: map-get($map, "px");
+  $rem-get: map-get($map, "rem");
+
+  @if ($p-unit-global == "px" and $px-get != $rem-get) {
+    #{unquote($property)}: $px-get;
+  }
+
+  #{unquote($property)}: $rem-get;
+}
+
+/// Output a map of style rules containing rem values along with an (optional) fallback.
+/// @author zaza/pasteque
+/// @example
+///   @include p-rem(("font-size": 16px, "line-height": 32px));
+/// @group unit
+/// @parameter {Map} $rules - Css properties and values.
+@mixin p-rem($rules) {
+  @if (type-of($rules) == "map") {
+    @each $property, $value in $rules {
+      @include _p-rem($property, $value);
+    }
+  }
+  @else {
+    @warn "$rules must be a map containing of css properties and values. Output ø.";
+  }
+}

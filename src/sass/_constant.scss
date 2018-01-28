@@ -1,0 +1,27 @@
+////
+//// @access private
+////
+
+/// Pasteque constants.
+/// @author zaza/pasteque
+/// @property {Number} "BROWSER_DEFAULT_FONT_SIZE" [16px] - Default font-size for all browsers.
+/// @property {Number} "LINE_UNIT" [8px] - The unit of vertical rhythm.
+/// @property {Number} "LINE_MULTI" [4] - The multiplication factor used to define the distance between text baselines.
+/// @type Map
+$_PSTQ_: ("BROWSER_DEFAULT_FONT_SIZE": 16px, "LINE_UNIT": 8px, "LINE_MULTI": 4) !global;
+
+/// Pasteque constant getter.
+/// @author Hugo Giraudel
+/// @example
+///   p-get("BROWSER_DEFAULT_FONT_SIZE");
+/// @link https://www.sitepoint.com/dealing-constants-sass/
+/// @parameter {String} $key - Key of constant to get.
+/// @return {*} Constant value.
+/// @throw "Unknown constant `#{$key}`"
+@function p-get($key) {
+  @if (not map-has-key($_PSTQ_, $key)) {
+    @error "Unknown constant `#{$key}`";
+  }
+
+  @return map-get($_PSTQ_, $key);
+}

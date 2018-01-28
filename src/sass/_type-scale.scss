@@ -1,0 +1,37 @@
+////
+//// @author zaza/pasteque
+//// @group type-scale
+////
+
+/// Scale base font-size.
+/// @type Number
+$p-type-scale-base: p-get("BROWSER_DEFAULT_FONT_SIZE") !default;
+
+/// Scale default ratio.
+/// @type Number
+$p-type-scale-ratio: 1.5 !default;
+
+/// Increments scale up or down.
+/// @example
+///   p-ts();
+/// @link https://css-tricks.com/snippets/sass/power-function/
+/// @parameter {Number} $i [0] - Increment (unitless number).
+/// @parameter {Number} $base [$p-type-scale-base] - Base value the scale starts at.
+/// @parameter {Number} $ratio [$p-type-scale-ratio] - Ratio the scale is built on.
+/// @return {Number} New adjusted scale.
+@function p-ts($i: 0, $base: $p-type-scale-base, $ratio: $p-type-scale-ratio) {
+  $i: round($i);
+
+  @if ($i > 0) {
+    @for $j from 1 through $i {
+      $base: $base * $ratio;
+    }
+  }
+  @else if ($i < 0) {
+    @for $k from 1 through abs($i) {
+      $base: $base / $ratio;
+    }
+  }
+
+  @return round($base);
+}

@@ -1,0 +1,380 @@
+/// Default border-color value.
+/// @author zaza/pasteque
+/// @group vertical-rhythm
+/// @link http://compass-style.org/reference/compass/typography/
+/// @type Color
+$p-border-color-global: #ccc !default;
+
+/// Default border-style value.
+/// @author compass/typography
+/// @group vertical-rhythm
+/// @link http://compass-style.org/reference/compass/typography/
+/// @type String
+$p-border-style-global: "solid" !default;
+
+/// Default border-width value.
+/// @author compass/typography
+/// @group vertical-rhythm
+/// @link http://compass-style.org/reference/compass/typography/
+/// @type Number
+$p-border-width-global: 1px !default;
+
+/// Toggle vertical grid.
+/// @author compass/layout
+/// @group debug
+/// @link http://compass-style.org/reference/compass/layout/
+/// @type Bool
+$pasteque-debug-toggle: true !default;
+
+/// Vertical grid color.
+/// @author compass/layout
+/// @group debug
+/// @link http://compass-style.org/reference/compass/layout/
+/// @type Color
+$pasteque-debug-color: #f00 !default;
+
+/// Calculate rhythm units.
+/// @author compass/typography
+/// @example
+///   p-rhythm();
+/// @group vertical-rhythm
+/// @link http://compass-style.org/reference/compass/typography/
+/// @parameter {Number} $lines [1] - Multiples of baseline rhythm.
+/// @parameter {Number} $minus [0]
+/// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
+/// @return {Number} Rhythm.
+@function p-rhythm($lines: 1, $minus: 0, $from: null) {
+  $line-height: p-get("LINE_UNIT") * p-get("LINE_MULTI") / 2;
+  $_return: p-convert-length(($lines * $line-height) - $minus, $p-unit-global, $from);
+
+  @if (unit($_return) == "px") {
+    $_return: floor($_return);
+  }
+
+  @if ($_return == 0) {
+    $_return: $_return / ($_return * 0 + 1);
+  }
+
+  @return $_return;
+}
+
+/// Calculate the minimum multiple of rhythm units needed to contain a length.
+/// @access private
+/// @alias p-lines-for-font-size
+/// @author zaza/pasteque
+/// @example
+///   _p-lines-for(16px);
+/// @group vertical-rhythm
+/// @parameter {Number} $from
+/// @return {Number} Multiple of rhythm units.
+@function _p-lines-for($from) {
+  $line-height: p-get("LINE_UNIT") * p-get("LINE_MULTI") / 2;
+
+  @return ceil($from / $line-height);
+}
+
+/// Calculate the minimum multiple of line-height units needed to contain a font-size.
+/// @access private
+/// @author compass/typography
+/// @example
+///   p-lines-for-font-size(16px);
+/// @group vertical-rhythm
+/// @link http://compass-style.org/reference/compass/typography/
+/// @parameter {Number} $from
+/// @return {Number} Multiple of rhythm units.
+@function p-lines-for-font-size($from) {
+  $_this: _p-lines-for($from);
+  $_return: p-get("LINE_MULTI") / 2;
+
+  @if ($_this > $_return) {
+    $_return: $_this;
+  }
+
+  @return $_return;
+}
+
+/// Establishes a font baseline.
+/// @author compass/typography
+/// @example
+///   @include p-establish-baseline
+/// @group vertical-rhythm
+/// @link http://compass-style.org/reference/compass/typography/
+@mixin p-establish-baseline {
+  font-size: 100%;
+  line-height: p-convert-length((p-get("LINE_UNIT") * p-get("LINE_MULTI")), "em");
+}
+
+/// Show background-image used to debug vertical alignment.
+/// @author zaza/pasteque
+/// @example
+///   @include pasteque-debug(#000);
+/// @group debug
+/// @parameter {Color} $color [$pasteque-debug-color]
+@mixin pasteque-debug($color: $pasteque-debug-color) {
+  $line-unit: p-get("LINE_UNIT");
+  $line-height: $line-unit * p-get("LINE_MULTI") / 2;
+  $background-image: ();
+  $background-size: ();
+
+  @each $roloc, $rhythm in (rgba($color, 0.2), $line-unit), (rgba($color, 0.6), $line-height) {
+    $background-image: append($background-image, linear-gradient(to top, #{$roloc} #{percentage(1px / $rhythm)}, #{rgba($roloc, 0)} #{percentage(1px / $rhythm)}), "comma");
+    $background-size: append($background-size, 100% p-convert-length($rhythm, $p-unit-global), "comma");
+  }
+
+  //noinspection CssOptimizeSimilarProperties
+  background-image: $background-image;
+  //noinspection CssOptimizeSimilarProperties
+  background-position: top right;
+  @include _p-rem("background-size", $background-size);
+}
+
+/// Adjust a block to have different line height to maintain the rhythm.
+/// @author compass/typography
+/// @example
+///   @include p-line-height(2);
+/// @group vertical-rhythm
+/// @link http://compass-style.org/reference/compass/typography/
+/// @parameter {Number} $lines - Multiples of baseline rhythm.
+/// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
+@mixin p-line-height($lines, $from: null) {
+  $senil: p-get("LINE_MULTI") / 2;
+
+  @if (unitless($lines)) {
+    @if ($lines > $senil) {
+      $senil: $lines;
+    }
+  }
+  @else {
+    $lines: p-convert-length($lines, "px", $from);
+    $senil: p-lines-for-font-size($lines);
+  }
+
+  @if (type-of($from) == "number" and unitless($from)) {
+    $from: p-ts($from);
+  }
+
+  @include _p-rem("line-height", p-rhythm($senil, 0, $from));
+}
+
+/// Adjust a block to have a different font size and line height to maintain the rhythm.
+/// @author compass/typography
+/// @example
+///   @include p-font-size(16px);
+/// @group vertical-rhythm
+/// @link http://compass-style.org/reference/compass/typography/
+/// @parameter {Number} $to
+/// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
+@mixin p-font-size($to, $from: null) {
+  @if (unitless($to)) {
+    $to: p-ts($to);
+  }
+
+  @if (type-of($from) == "number" and unitless($from)) {
+    $from: p-ts($from);
+  }
+
+  @include _p-rem("font-size", p-convert-length($to, $p-unit-global, $from));
+  @include p-line-height($to, $from);
+}
+
+/// Apply whitespace. The $property can be margin or padding.
+/// @access private
+/// @author zaza/pasteque
+/// @example
+///   @include p-apply-side-rhythm-whitespace("padding-top");
+/// @group vertical-rhythm
+/// @parameter {String} $property - Can be margin or padding.
+/// @parameter {Number} $lines [1] - Multiples of baseline rhythm.
+/// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
+@mixin p-apply-side-rhythm-whitespace($property, $lines: 1, $from: null) {
+  @if (not unitless($lines)) {
+    $lines: _p-lines-for($lines);
+  }
+
+  @if (type-of($from) == "number" and unitless($from)) {
+    $from: p-ts($from);
+  }
+
+  @include _p-rem($property, p-rhythm($lines, 0, $from));
+}
+
+/// Apply leading whitespace as padding.
+/// @author compass/typography
+/// @example
+///   @include p-padding-top();
+/// @group vertical-rhythm
+/// @link http://compass-style.org/reference/compass/typography/
+/// @parameter {Number} $lines [1] - Multiples of baseline rhythm.
+/// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
+@mixin p-padding-top($lines: 1, $from: null) {
+  @include p-apply-side-rhythm-whitespace("padding-top", $lines, $from);
+}
+
+/// Apply trailing whitespace as padding.
+/// @author compass/typography
+/// @example
+///   @include p-padding-bottom();
+/// @group vertical-rhythm
+/// @link http://compass-style.org/reference/compass/typography/
+/// @parameter {Number} $lines [1] - Multiples of baseline rhythm.
+/// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
+@mixin p-padding-bottom($lines: 1, $from: null) {
+  @include p-apply-side-rhythm-whitespace("padding-bottom", $lines, $from);
+}
+
+/// Shorthand mixin to apply whitespace for any side padding.
+/// @author compass/typography
+/// @example
+///   @include p-padding();
+/// @group vertical-rhythm
+/// @link http://compass-style.org/reference/compass/typography/
+/// @parameter {Number} $top [1] - Multiples of baseline rhythm to apply as leading whitespace as padding.
+/// @parameter {Number} $right [0] - Multiples of baseline rhythm to apply as whitespace as padding-right.
+/// @parameter {Number} $bottom [$top] - Multiples of baseline rhythm to apply as trailing whitespace as padding.
+/// @parameter {Number} $left [$right] - Multiples of baseline rhythm to apply as whitespace as padding-left.
+/// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
+@mixin p-padding($top: 1, $right: 0, $bottom: $top, $left: $right, $from: null) {
+  @if ($top > 0) {
+    @include p-apply-side-rhythm-whitespace("padding-top", $top, $from);
+  }
+
+  @if ($right > 0) {
+    @include p-apply-side-rhythm-whitespace("padding-right", $right, $from);
+  }
+
+  @if ($bottom > 0) {
+    @include p-apply-side-rhythm-whitespace("padding-bottom", $bottom, $from);
+  }
+
+  @if ($left > 0) {
+    @include p-apply-side-rhythm-whitespace("padding-left", $left, $from);
+  }
+}
+
+/// Apply leading whitespace as margin.
+/// @author compass/typography
+/// @example
+///   @include p-margin-top();
+/// @group vertical-rhythm
+/// @link http://compass-style.org/reference/compass/typography/
+/// @parameter {Number} $lines [1] - Multiples of baseline rhythm.
+/// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
+@mixin p-margin-top($lines: 1, $from: null) {
+  @include p-apply-side-rhythm-whitespace("margin-top", $lines, $from);
+}
+
+/// Apply trailing whitespace as margin.
+/// @author compass/typography
+/// @example
+///   @include p-margin-bottom();
+/// @group vertical-rhythm
+/// @link http://compass-style.org/reference/compass/typography/
+/// @parameter {Number} $lines [1] - Multiples of baseline rhythm.
+/// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
+@mixin p-margin-bottom($lines: 1, $from: null) {
+  @include p-apply-side-rhythm-whitespace("margin-bottom", $lines, $from);
+}
+
+/// Shorthand mixin to apply whitespace for any side margin.
+/// @author compass/typography
+/// @example
+///   @include p-margin();
+/// @group vertical-rhythm
+/// @link http://compass-style.org/reference/compass/typography/
+/// @parameter {Number} $top [1] - Multiples of baseline rhythm to apply as leading whitespace as margin.
+/// @parameter {Number} $right [0] - Multiples of baseline rhythm to apply as whitespace as margin-right.
+/// @parameter {Number} $bottom [$top] - Multiples of baseline rhythm to apply as trailing whitespace as margin.
+/// @parameter {Number} $left [$right] - Multiples of baseline rhythm to apply as whitespace as margin-left.
+/// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
+@mixin p-margin($top: 1, $right: 0, $bottom: $top, $left: $right, $from: null) {
+  @if ($top != 0) {
+    @include p-apply-side-rhythm-whitespace("margin-top", $top, $from);
+  }
+
+  @if ($right != 0) {
+    @include p-apply-side-rhythm-whitespace("margin-right", $right, $from);
+  }
+
+  @if ($bottom != 0) {
+    @include p-apply-side-rhythm-whitespace("margin-bottom", $bottom, $from);
+  }
+
+  @if ($left != 0) {
+    @include p-apply-side-rhythm-whitespace("margin-left", $left, $from);
+  }
+}
+
+/// Apply a border and whitespace to any side without destroying the vertical rhythm.
+/// @access private
+/// @author compass/typography
+/// @example
+///   @include p-apply-side-rhythm-border("all");
+/// @group vertical-rhythm
+/// @link http://compass-style.org/reference/compass/typography/
+/// @parameter {String} $side - String matching a css side keyword, e.g. `top`, `right`, `bottom`, `left` or all.
+/// @parameter {Number} $lines [1] - Multiples of baseline rhythm.
+/// @parameter {Number} $width [$p-border-width-global] - Border width.
+/// @parameter {Color} $color [$p-border-color-global] - Border color.
+/// @parameter {String} $style [$p-border-style-global] - Border style.
+/// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
+@mixin p-apply-side-rhythm-border($side, $lines: 1, $width: $p-border-width-global, $style: $p-border-style-global, $color: $p-border-color-global, $from: null) {
+  $border: "border";
+  $padding: "padding";
+
+  @if (index(("top", "right", "bottom", "left"), $side) != null) {
+    $border: $border + "-#{$side}";
+    $padding: $padding + "-#{$side}";
+  }
+
+  @if (not unitless($lines)) {
+    $lines: _p-lines-for($lines);
+  }
+
+  @include _p-rem($padding, p-rhythm($lines, $width, $from));
+  @include _p-rem($border, (p-convert-length($width, $p-unit-global, $from) unquote($style) $color));
+}
+
+/// Apply borders and whitespace equally to all sides.
+/// @author compass/typography
+/// @example
+///   @include p-border();
+/// @group vertical-rhythm
+/// @link http://compass-style.org/reference/compass/typography/
+/// @parameter {Number} $lines [1] - Multiples of baseline rhythm.
+/// @parameter {Number} $width [$p-border-width-global] - Border width.
+/// @parameter {Color} $color [$p-border-color-global] - Border color.
+/// @parameter {String} $style [$p-border-style-global] - Border style.
+/// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
+@mixin p-border($lines: 1, $width: $p-border-width-global, $style: $p-border-style-global, $color: $p-border-color-global, $from: null) {
+  @include p-apply-side-rhythm-border("all", $lines, $width, $style, $color, $from);
+}
+
+/// Apply a leading border.
+/// @author compass/typography
+/// @example
+///   @include p-border-top();
+/// @group vertical-rhythm
+/// @link http://compass-style.org/reference/compass/typography/
+/// @parameter {Number} $lines [1] - Multiples of baseline rhythm.
+/// @parameter {Number} $width [$p-border-width-global] - Border width.
+/// @parameter {Color} $color [$p-border-color-global] - Border color.
+/// @parameter {String} $style [$p-border-style-global] - Border style.
+/// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
+@mixin p-border-top($lines: 1, $width: $p-border-width-global, $style: $p-border-style-global, $color: $p-border-color-global, $from: null) {
+  @include p-apply-side-rhythm-border("top", $lines, $width, $style, $color, $from);
+}
+
+/// Apply a trailing border.
+/// @author compass/typography
+/// @example
+///   @include p-border-bottom();
+/// @group vertical-rhythm
+/// @link http://compass-style.org/reference/compass/typography/
+/// @parameter {Number} $lines [1] - Multiples of baseline rhythm.
+/// @parameter {Number} $width [$p-border-width-global] - Border width.
+/// @parameter {Color} $color [$p-border-color-global] - Border color.
+/// @parameter {String} $style [$p-border-style-global] - Border style.
+/// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
+@mixin p-border-bottom($lines: 1, $width: $p-border-width-global, $style: $p-border-style-global, $color: $p-border-color-global, $from: null) {
+  @include p-apply-side-rhythm-border("bottom", $lines, $width, $style, $color, $from);
+}

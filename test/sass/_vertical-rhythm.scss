@@ -1,0 +1,195 @@
+@mixin before-test-vertical-rhythm {
+  $_PSTQ_: map-merge($_PSTQ_, ("LINE_UNIT": 8px, "LINE_MULTI": 4)) !global;
+  $p-border-color-global: #ccc !global;
+  $p-border-style-global: "solid" !global;
+  $p-border-width-global: 1px !global;
+}
+
+@include before-test-vertical-rhythm;
+
+@include test-module("p-rhythm [function]") {
+  @include test("Should return default rhythm.") {
+    $lines: 1;
+    $output: p-rhythm($lines);
+    $expect: 1rem;
+
+    @include assert-equal($output, $expect);
+  }
+
+  @include test("Should return line-height minus value assigned to `$minus`.") {
+    $lines: 1;
+    $minus: 2px;
+    $output: p-rhythm($lines, $minus);
+    $expect: 0.875rem;
+
+    @include assert-equal($output, $expect);
+  }
+}
+
+@include test-module("_p-lines-for [function]") {
+  @include test("Should return minimum multiple of rhythm units needed to contain length.") {
+    $from: 16px;
+    $output: _p-lines-for($from);
+    $expect: 1;
+
+    @include assert-equal($output, $expect);
+  }
+}
+
+@include test-module("p-lines-for-font-size [function]") {
+  @include test("Should return minimum multiple of line-height units needed to contain font-size.") {
+    $from: 16px;
+    $output: p-lines-for-font-size($from);
+    $expect: 2;
+
+    @include assert-equal($output, $expect);
+  }
+}
+
+@include test-module("pasteque-debug [mixin]") {
+  @include test("Should output background-image w/ new `$color` assigned value.") {
+    @include assert {
+      $color: #000;
+
+      @include output {
+        @include pasteque-debug($color);
+      }
+
+      @include expect {
+        //noinspection CssOptimizeSimilarProperties
+        background-image: linear-gradient(to top, rgba(0, 0, 0, 0.2) 12.5%, transparent 12.5%), linear-gradient(to top, rgba(0, 0, 0, 0.6) 6.25%, transparent 6.25%);
+        //noinspection CssOptimizeSimilarProperties
+        background-position: top right;
+        background-size: 100% 0.5rem, 100% 1rem;
+      }
+    }
+  }
+}
+
+@include test-module("p-line-height [mixin]") {
+  @include test("Should output a correct line-height w/ unitless `$from` value.") {
+    @include assert {
+      @include output {
+        $lines: 1;
+
+        @include p-line-height($lines);
+      }
+
+      @include expect {
+        line-height: 2rem;
+      }
+    }
+  }
+
+  @include test("Should output a line-height w/ not unitless `$from` value.") {
+    @include assert {
+      @include output {
+        $lines: 16px;
+
+        @include p-line-height($lines);
+      }
+
+      @include expect {
+        line-height: 2rem;
+      }
+    }
+  }
+}
+
+@include test-module("p-font-size [mixin]") {
+  @include test("Should output font-size and line-height w/ not unitless `$to`.") {
+    @include assert {
+      @include output {
+        $to: 16px;
+
+        @include p-font-size($to);
+      }
+
+      @include expect {
+        font-size: 1rem;
+        line-height: 2rem;
+      }
+    }
+  }
+
+  @include test("Should output font-size and line-height w/ unitless `$to`.") {
+    @include assert {
+      @include output {
+        $to: 3;
+
+        @include p-font-size($to);
+      }
+
+      @include expect {
+        font-size: 3.375rem;
+        line-height: 4rem;
+      }
+    }
+  }
+
+  @include test("Should output font-size and line-height adjusted from new assigned `$from` value.") {
+    @include assert {
+      @include output {
+        $to: 0.6em;
+        $from: 122px;
+
+        @include p-font-size($to, $from);
+      }
+
+      @include expect {
+        font-size: 4.575rem;
+        line-height: 5rem;
+      }
+    }
+  }
+
+  @include test("Should output font-size and line-height adjusted from new assigned `$from` unitless value.") {
+    @include assert {
+      @include output {
+        $to: 0.6em;
+        $from: 5;
+
+        @include p-font-size($to, $from);
+      }
+
+      @include expect {
+        font-size: 4.575rem;
+        line-height: 5rem;
+      }
+    }
+  }
+}
+
+@include test-module("p-apply-side-rhythm-whitespace [mixin]") {
+  @include test("Should output side rhythm whitespace.") {
+    @include assert {
+      @include output {
+        $property: "padding-top";
+        $lines: 2;
+
+        @include p-apply-side-rhythm-whitespace($property, $lines);
+      }
+
+      @include expect {
+        padding-top: 2rem;
+      }
+    }
+  }
+}
+
+@include test-module("p-apply-side-rhythm-border [mixin]") {
+  @include test("Should output border and a whitespace w/ new assigned `$side` value.") {
+    @include assert {
+      @include output {
+        $side: "top";
+
+        @include p-apply-side-rhythm-border($side);
+      }
+
+      @include expect {
+        padding-top: 0.9375rem;
+        border-top: 0.0625rem solid #ccc;
+      }
+    }
+  }
+}
