@@ -1,5 +1,5 @@
 ////
-//// @author zaza/pasteque
+//// @author shayo/pasteque
 //// @group type-scale
 ////
 
@@ -14,6 +14,8 @@ $p-type-scale-ratio: 1.5 !default;
 /// Increments scale up or down.
 /// @example
 ///   p-ts();
+/// @example
+///   p-ts(1, 14px, 1.333);
 /// @link https://css-tricks.com/snippets/sass/power-function/
 /// @parameter {Number} $i [0] - Increment (unitless number).
 /// @parameter {Number} $base [$p-type-scale-base] - Base value the scale starts at.
