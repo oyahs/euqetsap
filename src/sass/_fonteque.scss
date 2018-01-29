@@ -1,8 +1,9 @@
 ////
-//// @author zaza/pasteque
+//// @author shayo/pasteque
 ////
 
 /// Fonts.
+/// @access private
 /// @type Map
 $p-fonteque: () !global;
 
@@ -10,6 +11,7 @@ $p-fonteque: () !global;
 /// @example
 ///   @include p-fonteque-set("heading", ("family": ("Open Sans", sans-serif), "cap-height": 0.72));
 /// @link https://www.sitepoint.com/dealing-constants-sass/
+/// @output ø
 /// @parameter {String} $key - Font's key to set.
 /// @parameter {Map} $spec - Font spec map.
 @mixin p-fonteque-set($key, $spec) {
@@ -25,7 +27,9 @@ $p-fonteque: () !global;
     @error "`#{$key}`'s family $spec must have a correct (unitless number) `cap-height` value.";
   }
 
-  @if (not map-get($spec, "cap-height") or not unitless(map-get($spec, "cap-height")) or map-get($spec, "cap-height") > 1) {
+  $cap-height: map-get($spec, "cap-height");
+
+  @if (type-of($cap-height) != "number") or (not unitless($cap-height)) or ($cap-height > 1) {
     @error "`#{$key}`'s family $spec must have a correct (unitless number) `cap-height` value.";
   }
 
@@ -36,9 +40,9 @@ $p-fonteque: () !global;
 /// @example
 ///   @include p-fonteque-get("heading");
 /// @example
-///   @include p-fonteque-get("if-it-does-not-exist", ("family", sans-serif));
+///   @include p-fonteque-get("if-it-does-not-exist", ("family": sans-serif));
 /// @parameter {String} $key - Font's key to get.
-/// @parameter {Map} $spec [null] - Fallback font spec.
+/// @parameter {Map|Null} $spec [null] - Fallback font spec.
 @mixin p-fonteque-get($key, $spec: null) {
   @if (type-of($spec) != "map") {
     $spec: ();
@@ -50,7 +54,7 @@ $p-fonteque: () !global;
 
   @each $property, $value in $spec {
     @if (index(("family", "style", "weight"), $property) != null) {
-      #{unquote("font-#{$property}")}: if($property != "family" and type-of($value) == "string", unquote($value), $value);
+      #{unquote("font-#{$property}")}: if(($property != "family") and (type-of($value) == "string"), unquote($value), $value);
     }
   }
 }

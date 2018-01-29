@@ -6,6 +6,16 @@
 @include before-test-type-scale;
 
 @include test-module("p-ts [function]") {
+  @include test("Should return 2^2 value.") {
+    $i: 1;
+    $base: 2;
+    $ratio: 2;
+    $output: p-ts($i, $base, $ratio);
+    $expect: 4;
+
+    @include assert-equal($output, $expect);
+  }
+
   @include test("Should return default base scale.") {
     $i: 0;
     $output: p-ts($i);
@@ -14,28 +24,20 @@
     @include assert-equal($output, $expect);
   }
 
-  @include test("Should return lower value than default scale w/ negative integer `$i`.") {
-    $i: -5;
+  @include test("Should return greater value than `$base` w/ a negative integer `$i`.") {
+    $i: -1;
     $output: p-ts($i);
-    $expect: 2px;
+    $expect: 11px;
 
     @include assert-equal($output, $expect);
   }
 
-  @include test("Should return new `$base` assigned value.") {
-    $base: 10px;
-    $output: p-ts($base: $base);
-    $expect: $p-type-scale-base;
-
-    @include assert-unequal($output, $expect);
-  }
-
-  @include test("Should return 2^2 value.") {
-    $i: 1;
-    $base: 2;
-    $ratio: 2;
+  @include test("Should return new scale w/ new assigned values to `$i`, `$base`, `$ratio`.") {
+    $i: 3;
+    $base: 14px;
+    $ratio: 1.3333333333;
     $output: p-ts($i, $base, $ratio);
-    $expect: 4px;
+    $expect: 33px;
 
     @include assert-equal($output, $expect);
   }

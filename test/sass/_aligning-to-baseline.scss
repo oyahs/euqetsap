@@ -1,5 +1,5 @@
 @mixin before-test-aligning-to-baseline {
-  $p-fonteque: ("test": ("family": sans-serif, "cap-height": 0.72)) !global;
+  $p-fonteque: map-merge($p-fonteque, ("test": ("family": sans-serif, "cap-height": 0.72))) !global;
 }
 
 @include before-test-aligning-to-baseline;
@@ -16,7 +16,7 @@
 }
 
 @include test-module("p-fonteque-get [mixin]") {
-  @include test("Should output styles rules of `$key`'s family font.") {
+  @include test("Should output style rules of `$key`'s family font.") {
     @include assert {
       @include output {
         @include p-fonteque-get("test");
@@ -28,14 +28,15 @@
     }
   }
 
-  @include test("Should output fallback's styles rules") {
+  @include test("Should output fallback font style rules.") {
     @include assert {
       @include output {
-        @include p-fonteque-get("if-it-does-not-exist", ("style": "normal"));
+        @include p-fonteque-get("if-it-does-not-exist", ("style": "italic", "weight": "bold"));
       }
 
       @include expect {
-        font-style: normal;
+        font-style: italic;
+        font-weight: bold;
       }
     }
   }
@@ -70,6 +71,49 @@
 
       @include expect {
         margin-bottom: 1.75rem;
+      }
+    }
+  }
+}
+
+@include test-module("p-type-to-baseline [mixin]") {
+  @include test("Should output padding-top to move the text downwards and margin-bottom to fix vertical rhythm for elements below.") {
+    @include assert {
+      @include output {
+        $to: 16px;
+        $font: "test";
+        $leader: 1;
+        $trailer: 3;
+
+        @include p-type-to-baseline($to, $font, $leader, $trailer);
+      }
+
+      @include expect {
+        font-size: 1rem;
+        line-height: 2rem;
+        padding-top: 1.64rem;
+        margin-bottom: 3.36rem;
+      }
+    }
+  }
+}
+
+@include test-module("p-component-to-baseline [mixin]") {
+  @include test("Should output padding-top to move the text downwards and padding-bottom to fix vertical rhythm for elements below.") {
+    @include assert {
+      @include output {
+        $to: 16px;
+        $font: "test";
+        $lines: 2;
+
+        @include p-component-to-baseline($to, $font, $lines);
+      }
+
+      @include expect {
+        font-size: 1rem;
+        line-height: 2rem;
+        padding-top: 2.64rem;
+        padding-bottom: 2.36rem;
       }
     }
   }

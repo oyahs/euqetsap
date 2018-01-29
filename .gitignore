@@ -1,3 +1,7 @@
+# tmp
+.tmp/
+_docs/
+
 # Created by https://www.gitignore.io/api/node,sass,macos,webstorm+all
 
 ### macOS ###
