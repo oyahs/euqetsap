@@ -1,3 +1,14 @@
+//
+// pasteque
+// 0.0.3
+// Beautify typography. Pasteque is a fork from Compass/typography.
+// Zaza Agency <hi@zaza.africa> (zaza.africa)
+//
+// This work is licensed under the Creative Commons
+// Attribution 4.0 International License. To view a copy
+// of this license, visit http://creativecommons.org/licenses/by/4.0/.
+//
+
 /// Default border-color value.
 /// @author shayo/pasteque
 /// @group vertical-rhythm
@@ -142,6 +153,10 @@ $pasteque-debug-color: #f00 !default;
 /// @parameter {Number} $lines - Multiples of baseline rhythm.
 /// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
 @mixin p-line-height($lines, $from: null) {
+  @if (type-of($from) == "number") and (unitless($from)) {
+    $from: p-ts($from);
+  }
+
   $default: p-get("LINE_MULTI") / 2;
 
   @if (unitless($lines)) {
@@ -152,10 +167,6 @@ $pasteque-debug-color: #f00 !default;
   @else {
     $lines: p-convert-length($lines, "px", $from);
     $default: p-lines-for-font-size($lines);
-  }
-
-  @if (type-of($from) == "number") and (unitless($from)) {
-    $from: p-ts($from);
   }
 
   @include _p-rem("line-height", p-rhythm($default, 0, $from));
@@ -172,37 +183,16 @@ $pasteque-debug-color: #f00 !default;
 /// @parameter {Number} $to
 /// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
 @mixin p-font-size($to, $from: null) {
+  @if (type-of($from) == "number") and (unitless($from)) {
+    $from: p-ts($from);
+  }
+
   @if (unitless($to)) {
     $to: p-ts($to);
   }
 
-  @if (type-of($from) == "number") and (unitless($from)) {
-    $from: p-ts($from);
-  }
-
   @include _p-rem("font-size", p-convert-length($to, $p-unit-global, $from));
   @include p-line-height($to, $from);
-}
-
-/// Apply whitespace.
-/// @access private
-/// @author shayo/pasteque
-/// @example
-///   @include p-apply-side-rhythm-whitespace("padding-top");
-/// @group vertical-rhythm
-/// @parameter {String} $property - `$property` can be padding or margin.
-/// @parameter {Number} $lines [1] - Multiples of baseline rhythm.
-/// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
-@mixin p-apply-side-rhythm-whitespace($property, $lines: 1, $from: null) {
-  @if (not unitless($lines)) {
-    $lines: _p-lines-for($lines);
-  }
-
-  @if (type-of($from) == "number") and (unitless($from)) {
-    $from: p-ts($from);
-  }
-
-  @include _p-rem($property, p-rhythm($lines, 0, $from));
 }
 
 /// Apply leading whitespace as padding.
@@ -216,7 +206,15 @@ $pasteque-debug-color: #f00 !default;
 /// @parameter {Number} $lines [1] - Multiples of baseline rhythm.
 /// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
 @mixin p-padding-top($lines: 1, $from: null) {
-  @include p-apply-side-rhythm-whitespace("padding-top", $lines, $from);
+  @if (type-of($from) == "number") and (unitless($from)) {
+    $from: p-ts($from);
+  }
+
+  @if (not unitless($lines)) {
+    $lines: _p-lines-for($lines);
+  }
+
+  @include _p-rem("padding-top", p-rhythm($lines, 0, $from));
 }
 
 /// Apply trailing whitespace as padding.
@@ -230,7 +228,15 @@ $pasteque-debug-color: #f00 !default;
 /// @parameter {Number} $lines [1] - Multiples of baseline rhythm.
 /// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
 @mixin p-padding-bottom($lines: 1, $from: null) {
-  @include p-apply-side-rhythm-whitespace("padding-bottom", $lines, $from);
+  @if (type-of($from) == "number") and (unitless($from)) {
+    $from: p-ts($from);
+  }
+
+  @if (not unitless($lines)) {
+    $lines: _p-lines-for($lines);
+  }
+
+  @include _p-rem("padding-bottom", p-rhythm($lines, 0, $from));
 }
 
 /// Shorthand mixin to apply whitespace for any side as padding.
@@ -249,20 +255,49 @@ $pasteque-debug-color: #f00 !default;
 /// @parameter {Number} $left [$right] - Multiples of baseline rhythm to apply as whitespace as padding-left.
 /// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
 @mixin p-padding($top: 1, $right: 0, $bottom: $top, $left: $right, $from: null) {
-  @if ($top > 0) {
-    @include p-apply-side-rhythm-whitespace("padding-top", $top, $from);
+  @if (type-of($from) == "number") and (unitless($from)) {
+    $from: p-ts($from);
   }
 
-  @if ($right > 0) {
-    @include p-apply-side-rhythm-whitespace("padding-right", $right, $from);
+  $values: ();
+
+  @each $key, $value in ("top": $top, "right": $right, "bottom": $bottom, "left": $left) {
+    @if (not unitless($value)) {
+      $value: _p-lines-for($value);
+    }
+
+    $rhythm: p-rhythm($value, 0, $from);
+
+    @if ($rhythm > 0) {
+      $values: map-merge($values, ($key: $rhythm));
+    }
   }
 
-  @if ($bottom > 0) {
-    @include p-apply-side-rhythm-whitespace("padding-bottom", $bottom, $from);
+  @if (map-get($values, "top") == map-get($values, "right")) and (map-get($values, "top") == map-get($values, "bottom")) and (map-get($values, "top") == map-get($values, "left")) {
+    @include _p-rem("padding", map-get($values, "top"));
   }
+  @else if (map-has-key($values, "top")) and (map-get($values, "top") == map-get($values, "bottom")) and (map-has-key($values, "right")) and (map-get($values, "right") == map-get($values, "left")) {
+    @include _p-rem("padding", map-get($values, "top") map-get($values, "right"));
+  }
+  @else if (map-has-key($values, "top")) and (map-has-key($values, "right")) and (map-has-key($values, "bottom")) and (map-has-key($values, "left")) {
+    @include _p-rem("padding", map-get($values, "top") map-get($values, "right") map-get($values, "bottom") map-get($values, "left"));
+  }
+  @else {
+    @if (map-has-key($values, "top")) {
+      @include _p-rem("padding-top", map-get($values, "top"));
+    }
 
-  @if ($left > 0) {
-    @include p-apply-side-rhythm-whitespace("padding-left", $left, $from);
+    @if (map-has-key($values, "right")) {
+      @include _p-rem("padding-right", map-get($values, "right"));
+    }
+
+    @if (map-has-key($values, "bottom")) {
+      @include _p-rem("padding-bottom", map-get($values, "bottom"));
+    }
+
+    @if (map-has-key($values, "left")) {
+      @include _p-rem("padding-left", map-get($values, "left"));
+    }
   }
 }
 
@@ -277,7 +312,15 @@ $pasteque-debug-color: #f00 !default;
 /// @parameter {Number} $lines [1] - Multiples of baseline rhythm.
 /// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
 @mixin p-margin-top($lines: 1, $from: null) {
-  @include p-apply-side-rhythm-whitespace("margin-top", $lines, $from);
+  @if (type-of($from) == "number") and (unitless($from)) {
+    $from: p-ts($from);
+  }
+
+  @if (not unitless($lines)) {
+    $lines: _p-lines-for($lines);
+  }
+
+  @include _p-rem("margin-top", p-rhythm($lines, 0, $from));
 }
 
 /// Apply trailing whitespace as margin.
@@ -291,7 +334,15 @@ $pasteque-debug-color: #f00 !default;
 /// @parameter {Number} $lines [1] - Multiples of baseline rhythm.
 /// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
 @mixin p-margin-bottom($lines: 1, $from: null) {
-  @include p-apply-side-rhythm-whitespace("margin-bottom", $lines, $from);
+  @if (type-of($from) == "number") and (unitless($from)) {
+    $from: p-ts($from);
+  }
+
+  @if (not unitless($lines)) {
+    $lines: _p-lines-for($lines);
+  }
+
+  @include _p-rem("margin-bottom", p-rhythm($lines, 0, $from));
 }
 
 /// Shorthand mixin to apply whitespace for any side as margin.
@@ -310,20 +361,49 @@ $pasteque-debug-color: #f00 !default;
 /// @parameter {Number} $left [$right] - Multiples of baseline rhythm to apply as whitespace as margin-left.
 /// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
 @mixin p-margin($top: 1, $right: 0, $bottom: $top, $left: $right, $from: null) {
-  @if ($top != 0) {
-    @include p-apply-side-rhythm-whitespace("margin-top", $top, $from);
+  @if (type-of($from) == "number") and (unitless($from)) {
+    $from: p-ts($from);
   }
 
-  @if ($right != 0) {
-    @include p-apply-side-rhythm-whitespace("margin-right", $right, $from);
+  $values: ();
+
+  @each $key, $value in ("top": $top, "right": $right, "bottom": $bottom, "left": $left) {
+    @if (not unitless($value)) {
+      $value: _p-lines-for($value);
+    }
+
+    $rhythm: p-rhythm($value, 0, $from);
+
+    @if ($rhythm != 0) {
+      $values: map-merge($values, ($key: $rhythm));
+    }
   }
 
-  @if ($bottom != 0) {
-    @include p-apply-side-rhythm-whitespace("margin-bottom", $bottom, $from);
+  @if (map-get($values, "top") == map-get($values, "right")) and (map-get($values, "top") == map-get($values, "bottom")) and (map-get($values, "top") == map-get($values, "left")) {
+    @include _p-rem("margin", map-get($values, "top"));
   }
+  @else if (map-has-key($values, "top")) and (map-get($values, "top") == map-get($values, "bottom")) and (map-has-key($values, "right")) and (map-get($values, "right") == map-get($values, "left")) {
+    @include _p-rem("margin", map-get($values, "top") map-get($values, "right"));
+  }
+  @else if (map-has-key($values, "top")) and (map-has-key($values, "right")) and (map-has-key($values, "bottom")) and (map-has-key($values, "left")) {
+    @include _p-rem("margin", map-get($values, "top") map-get($values, "right") map-get($values, "bottom") map-get($values, "left"));
+  }
+  @else {
+    @if (map-has-key($values, "top")) {
+      @include _p-rem("margin-top", map-get($values, "top"));
+    }
 
-  @if ($left != 0) {
-    @include p-apply-side-rhythm-whitespace("margin-left", $left, $from);
+    @if (map-has-key($values, "right")) {
+      @include _p-rem("margin-right", map-get($values, "right"));
+    }
+
+    @if (map-has-key($values, "bottom")) {
+      @include _p-rem("margin-bottom", map-get($values, "bottom"));
+    }
+
+    @if (map-has-key($values, "left")) {
+      @include _p-rem("margin-left", map-get($values, "left"));
+    }
   }
 }
 
@@ -343,6 +423,10 @@ $pasteque-debug-color: #f00 !default;
 /// @parameter {Color} $color [$p-border-color-global] - Border color.
 /// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
 @mixin p-apply-side-rhythm-border($side, $lines: 1, $width: $p-border-width-global, $style: $p-border-style-global, $color: $p-border-color-global, $from: null) {
+  @if (type-of($from) == "number") and (unitless($from)) {
+    $from: p-ts($from);
+  }
+
   $padding-property: "padding";
   $border-property: "border";
 

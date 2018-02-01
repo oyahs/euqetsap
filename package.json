@@ -1,7 +1,7 @@
 {
-  "version": "0.0.2",
+  "version": "0.0.1",
   "author": "Zaza Agency <hi@zaza.africa> (zaza.africa)",
-  "license": "CC-BY-SA-4.0",
+  "license": "CC-BY-4.0",
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.38",
     "@babel/preset-env": "^7.0.0-beta.38",
@@ -31,7 +31,5 @@
     "build": "NODE_ENV=production gulp --require @babel/register --gulpfile task",
     "test": "mocha"
   },
-  "name": "pasteque",
-  "description": "Beautify typography. Pasteque is a fork from Compass typography.",
-  "main": "src/sass/pasteque.scss"
+  "name": "euqetsap"
 }

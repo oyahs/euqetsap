@@ -1,15 +1,22 @@
-// http://oddbird.net/true/
-// https://mattvanderpol.com/2015/07/01/sass-unit-testing-with-true/
+//
+// pasteque
+// 0.0.3
+// Beautify typography. Pasteque is a fork from Compass/typography.
+// Zaza Agency <hi@zaza.africa> (zaza.africa)
+//
+// This work is licensed under the Creative Commons
+// Attribution 4.0 International License. To view a copy
+// of this license, visit http://creativecommons.org/licenses/by/4.0/.
+//
 
 // Vendor
-// --------
 //noinspection CssUnknownTarget
 @import "true";
 //noinspection CssUnknownTarget
 @import "./src/sass/pasteque";
 
 // Unit
-// --------
+// https://mattvanderpol.com/2015/07/01/sass-unit-testing-with-true/
 @import "unit";
 @import "type-scale";
 @import "vertical-rhythm";

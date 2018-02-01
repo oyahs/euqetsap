@@ -1,3 +1,14 @@
+//
+// pasteque
+// 0.0.3
+// Beautify typography. Pasteque is a fork from Compass/typography.
+// Zaza Agency <hi@zaza.africa> (zaza.africa)
+//
+// This work is licensed under the Creative Commons
+// Attribution 4.0 International License. To view a copy
+// of this license, visit http://creativecommons.org/licenses/by/4.0/.
+//
+
 @mixin before-test-vertical-rhythm {
   $_PSTQ_: map-merge($_PSTQ_, ("LINE_UNIT": 8px, "LINE_MULTI": 4)) !global;
   $p-border-color-global: #ccc !global;
@@ -177,38 +188,6 @@
   }
 }
 
-@include test-module("p-apply-side-rhythm-whitespace [mixin]") {
-  @include test("Should output a whitespace as `$property`.") {
-    @include assert {
-      @include output {
-        $property: "padding-top";
-        $lines: 2;
-
-        @include p-apply-side-rhythm-whitespace($property, $lines);
-      }
-
-      @include expect {
-        padding-top: 2rem;
-      }
-    }
-  }
-
-  @include test("Should output a whitespace as `$property` w/ not unitless `$lines` value.") {
-    @include assert {
-      @include output {
-        $property: "margin-right";
-        $lines: 24px;
-
-        @include p-apply-side-rhythm-whitespace($property, $lines);
-      }
-
-      @include expect {
-        margin-right: 2rem;
-      }
-    }
-  }
-}
-
 @include test-module("p-padding-top [mixin]") {
   @include test("Should output leading whitespace as padding.") {
     @include assert {
@@ -270,18 +249,71 @@
 }
 
 @include test-module("p-padding [mixin]") {
-  @include test("Should output correct whitespace as padding.") {
+  @include test("Should output padding shorthand to apply whitespace equally to all sides.") {
     @include assert {
       @include output {
-        $top: -1;
-        $right: 2;
+        $top: 1;
+        $right: $top;
+        $bottom: $top;
+        $left: $right;
 
-        @include p-padding($top, $right);
+        @include p-padding($top, $right, $bottom, $left);
       }
 
       @include expect {
-        padding-right: 2rem;
-        padding-left: 2rem;
+        padding: 1rem;
+      }
+    }
+  }
+
+  @include test("Should output padding shorthand to apply horizontal and vertical whitespace.") {
+    @include assert {
+      @include output {
+        $top: 1;
+        $right: 2;
+        $bottom: $top;
+        $left: $right;
+
+        @include p-padding($top, $right, $bottom, $left);
+      }
+
+      @include expect {
+        padding: 1rem 2rem;
+      }
+    }
+  }
+
+  @include test("Should output padding shorthand to apply whitespace on each side.") {
+    @include assert {
+      @include output {
+        $top: 3;
+        $right: 5;
+        $bottom: 8;
+        $left: 13;
+
+        @include p-padding($top, $right, $bottom, $left);
+      }
+
+      @include expect {
+        padding: 3rem 5rem 8rem 13rem;
+      }
+    }
+  }
+
+  @include test("Should output horizontal whitespaces as padding.") {
+    @include assert {
+      @include output {
+        $top: 21;
+        $right: -34;
+        $bottom: $top;
+        $left: $right;
+
+        @include p-padding($top, $right, $bottom, $left);
+      }
+
+      @include expect {
+        padding-top: 21rem;
+        padding-bottom: 21rem;
       }
     }
   }
@@ -348,18 +380,71 @@
 }
 
 @include test-module("p-margin [mixin]") {
-  @include test("Should output correct whitespace as margin.") {
+  @include test("Should output margin shorthand to apply whitespace equally to all sides.") {
     @include assert {
       @include output {
-        $top: 0;
-        $right: 2;
+        $top: 1;
+        $right: $top;
+        $bottom: $top;
+        $left: $right;
 
-        @include p-margin($top, $right);
+        @include p-margin($top, $right, $bottom, $left);
       }
 
       @include expect {
-        margin-right: 2rem;
-        margin-left: 2rem;
+        margin: 1rem;
+      }
+    }
+  }
+
+  @include test("Should output margin shorthand to apply horizontal and vertical whitespace.") {
+    @include assert {
+      @include output {
+        $top: 1;
+        $right: 2;
+        $bottom: $top;
+        $left: $right;
+
+        @include p-margin($top, $right, $bottom, $left);
+      }
+
+      @include expect {
+        margin: 1rem 2rem;
+      }
+    }
+  }
+
+  @include test("Should output margin shorthand to apply whitespace on each side.") {
+    @include assert {
+      @include output {
+        $top: 3;
+        $right: 5;
+        $bottom: 8;
+        $left: 13;
+
+        @include p-margin($top, $right, $bottom, $left);
+      }
+
+      @include expect {
+        margin: 3rem 5rem 8rem 13rem;
+      }
+    }
+  }
+
+  @include test("Should output horizontal whitespaces as margin.") {
+    @include assert {
+      @include output {
+        $top: 21;
+        $right: 0;
+        $bottom: $top;
+        $left: $right;
+
+        @include p-margin($top, $right, $bottom, $left);
+      }
+
+      @include expect {
+        margin-top: 21rem;
+        margin-bottom: 21rem;
       }
     }
   }
