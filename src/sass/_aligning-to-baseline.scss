@@ -1,3 +1,14 @@
+//
+// pasteque
+// 0.0.3
+// Beautify typography. Pasteque is a fork from Compass/typography.
+// Zaza Agency <hi@zaza.africa> (zaza.africa)
+//
+// This work is licensed under the Creative Commons
+// Attribution 4.0 International License. To view a copy
+// of this license, visit http://creativecommons.org/licenses/by/4.0/.
+//
+
 ////
 //// @author shayo/pasteque
 //// @group aligning—to-baseline
@@ -41,12 +52,12 @@
 /// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
 @mixin p-adjust-padding-leader($to, $font, $lines: 0, $from: null) {
   @if (map-has-key($p-fonteque, $font)) {
-    @if (unitless($to)) {
-      $to: p-ts($to);
-    }
-
     @if (type-of($from) == "number") and (unitless($from)) {
       $from: p-ts($from);
+    }
+
+    @if (unitless($to)) {
+      $to: p-ts($to);
     }
 
     $cap-height: map-get(map-get($p-fonteque, $font), "cap-height") * 1em;
@@ -77,12 +88,12 @@
 /// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
 @mixin p-adjust-trailing-whitespace($to, $font, $lines: 0, $property: "margin", $from: null) {
   @if (map-has-key($p-fonteque, $font)) {
-    @if (unitless($to)) {
-      $to: p-ts($to);
-    }
-
     @if (type-of($from) == "number") and (unitless($from)) {
       $from: p-ts($from);
+    }
+
+    @if (unitless($to)) {
+      $to: p-ts($to);
     }
 
     $cap-height: map-get(map-get($p-fonteque, $font), "cap-height") * 1em;
