@@ -1,7 +1,11 @@
 //
 // pasteque
-// 0.0.3
-// Beautify typography. Pasteque is a fork from Compass/typography.
+//
+// 0.0.6
+//
+// Beautify typography.
+// pasteque is a fork from Compass typography.
+//
 // Zaza Agency <hi@zaza.africa> (zaza.africa)
 //
 // This work is licensed under the Creative Commons
@@ -9,16 +13,13 @@
 // of this license, visit http://creativecommons.org/licenses/by/4.0/.
 //
 
-@mixin before-test-vertical-rhythm {
-  $_PSTQ_: map-merge($_PSTQ_, ("LINE_UNIT": 8px, "LINE_MULTI": 4)) !global;
+@mixin before-test-typography {
   $p-border-color-global: #ccc !global;
   $p-border-style-global: "solid" !global;
   $p-border-width-global: 1px !global;
-  $pasteque-debug-toggle: true !global;
-  $pasteque-debug-color: #f00 !global;
 }
 
-@include before-test-vertical-rhythm;
+@include before-test-typography;
 
 @include test-module("p-rhythm [function]") {
   @include test("Should return default rhythm.") {
@@ -49,10 +50,10 @@
   }
 }
 
-@include test-module("p-lines-for-font-size [function]") {
+@include test-module("p-lines-for [function]") {
   @include test("Should return minimum multiple of line-height units needed to contain `$from`.") {
     $from: 5px;
-    $output: p-lines-for-font-size($from);
+    $output: p-lines-for($from);
     $expect: 2;
 
     @include assert-equal($output, $expect);
@@ -69,26 +70,6 @@
       @include expect {
         font-size: 100%;
         line-height: 2em;
-      }
-    }
-  }
-}
-
-@include test-module("pasteque-debug [mixin]") {
-  @include test("Should output background-image w/ new `$color` assigned value.") {
-    @include assert {
-      @include output {
-        $color: #000;
-
-        @include pasteque-debug($color);
-      }
-
-      @include expect {
-        //noinspection CssOptimizeSimilarProperties
-        background-image: linear-gradient(to top, rgba(0, 0, 0, 0.2) 12.5%, transparent 12.5%), linear-gradient(to top, rgba(0, 0, 0, 0.6) 6.25%, transparent 6.25%);
-        //noinspection CssOptimizeSimilarProperties
-        background-position: top right;
-        background-size: 100% 0.5rem, 100% 1rem;
       }
     }
   }
@@ -140,42 +121,11 @@
     }
   }
 
-  @include test("Should output font-size and line-height w/ unitless `$to`.") {
-    @include assert {
-      @include output {
-        $to: 3;
-
-        @include p-font-size($to);
-      }
-
-      @include expect {
-        font-size: 3.375rem;
-        line-height: 4rem;
-      }
-    }
-  }
-
   @include test("Should output font-size and line-height adjusted from new assigned `$from` value.") {
     @include assert {
       @include output {
         $to: 0.6em;
         $from: 122px;
-
-        @include p-font-size($to, $from);
-      }
-
-      @include expect {
-        font-size: 4.575rem;
-        line-height: 5rem;
-      }
-    }
-  }
-
-  @include test("Should output font-size and line-height adjusted from new assigned `$from` unitless value.") {
-    @include assert {
-      @include output {
-        $to: 0.6em;
-        $from: 5;
 
         @include p-font-size($to, $from);
       }

@@ -1,0 +1,132 @@
+/* stylelint-disable selector-max-type */
+
+html {
+  @include p-establish-baseline;
+}
+
+main {
+  max-width: 94%;
+  min-height: 100%;
+  margin: 0 auto;
+}
+
+main::before,
+main::after {
+  display: table;
+  content: " ";
+}
+
+main::after {
+  clear: both;
+}
+
+body {
+  position: relative;
+  font-family: sans-serif;
+  @include p-font-size(16px);
+}
+
+@if ($p-debug-toggle) {
+  body::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 9000;
+    display: block;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    content: "";
+    @include p-debug($p-debug-color);
+  }
+
+  body:active::after {
+    display: none;
+  }
+}
+
+h1 {
+  @include p-font-size(54px);
+  @include p-margin-top;
+  @include p-margin-bottom(2);
+}
+
+h2 {
+  @include p-font-size(36px);
+  @include p-margin-top;
+  @include p-margin-bottom;
+}
+
+h3 {
+  margin-bottom: 0;
+  @include p-font-size(24px);
+  @include p-margin-top;
+}
+
+h4 {
+  margin-bottom: 0;
+  @include p-font-size(16px);
+  @include p-margin-top;
+}
+
+h5,
+h6 {
+  margin-bottom: 0;
+  @include p-font-size(11px);
+  @include p-margin-top;
+}
+
+p,
+ul,
+ol,
+pre,
+table,
+blockquote {
+  margin-top: 0;
+  @include p-font-size(16px);
+  @include p-margin-bottom;
+}
+
+ul,
+ol {
+  & & {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}
+
+hr {
+  width: 100%;
+  height: 0;
+  margin: 0;
+  clear: both;
+  border: 0;
+  @include p-border-bottom;
+}
+
+a,
+b,
+i,
+strong,
+em,
+small,
+code {
+  line-height: 0;
+}
+
+sub,
+sup {
+  position: relative;
+  line-height: 0;
+  vertical-align: baseline;
+}
+
+sup {
+  top: -0.5em;
+}
+
+sub {
+  bottom: -0.25em;
+}
+
+/* stylelint-enable selector-max-type */

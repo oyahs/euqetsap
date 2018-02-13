@@ -1,7 +1,12 @@
 //
-// pasteque
-// 0.0.3
-// Beautify typography. Pasteque is a fork from Compass/typography.
+// pasteque-unit
+//
+// 0.0.6
+//
+// Beautify typography:
+// Unit.
+// pasteque-unit is a fork from Compass.
+//
 // Zaza Agency <hi@zaza.africa> (zaza.africa)
 //
 // This work is licensed under the Creative Commons
@@ -9,16 +14,10 @@
 // of this license, visit http://creativecommons.org/licenses/by/4.0/.
 //
 
-@mixin before-test-unit {
-  $_PSTQ_: map-merge($_PSTQ_, ("BROWSER_DEFAULT_FONT_SIZE": 16px)) !global;
-}
-
-@include before-test-unit;
-
-@include test-module("p-convert-length [function]") {
+@include test-module("p-unit-convert [function]") {
   @include test("Should return converted `$length` relative to base font-size.") {
     $length: 16px;
-    $output: p-convert-length($length, "rem");
+    $output: p-unit-convert($length, "rem");
     $expect: 1rem;
 
     @include assert-equal($output, $expect);
@@ -27,17 +26,17 @@
   @include test("Should return converted `$length` relative to new assigned `$from` value.") {
     $length: -0.04em;
     $from: 112px;
-    $output: p-convert-length($length, "rem", $from);
+    $output: p-unit-convert($length, "rem", $from);
     $expect: -0.28rem;
 
     @include assert-equal($output, $expect);
   }
 }
 
-@include test-module("_p-px-rem-version [function]") {
+@include test-module("_p-unit-px-rem [function]") {
   @include test("Should return px/rem versions of a px `$value`.") {
     $value: 13.21px;
-    $output: _p-px-rem-version($value);
+    $output: _p-unit-px-rem($value);
     $expect: ("px": 13px, "rem": 0.825625rem);
 
     @include assert-equal($output, $expect);
@@ -45,24 +44,24 @@
 
   @include test("Should return px/rem versions of a rem `$value`.") {
     $value: 34.55rem;
-    $output: _p-px-rem-version($value);
+    $output: _p-unit-px-rem($value);
     $expect: ("px": 553px, "rem": 34.55rem);
 
     @include assert-equal($output, $expect);
   }
 }
 
-@include test-module("p-px-rem-version [function]") {
+@include test-module("p-unit-px-rem [function]") {
   @include test("Should return px/rem versions of nested list `$value`.") {
     $value: (8px, (13.21px 34.55rem), 89rem);
-    $output: p-px-rem-version($value);
+    $output: p-unit-px-rem($value);
     $expect: ("px": (8px, (13px 553px), 1424px), "rem": (0.5rem, (0.825625rem 34.55rem), 89rem));
 
     @include assert-equal($output, $expect);
   }
 }
 
-@include test-module("_p-rem [mixin]") {
+@include test-module("p-unit-rem [mixin]") {
   @include test("Should output style rule containing rem values w/ fallback rule.") {
     @include assert {
       $p-unit-global: "px" !global;
@@ -71,13 +70,11 @@
         $property: "font-size";
         $value: 14px;
 
-        @include _p-rem($property, $value);
+        @include p-unit-rem($property, $value);
       }
 
       @include expect {
-        //noinspection CssOverwrittenProperties
         font-size: 14px;
-        //noinspection CssOverwrittenProperties
         font-size: 0.875rem;
       }
     }
@@ -91,52 +88,10 @@
         $property: "line-height";
         $value: 32px;
 
-        @include _p-rem($property, $value);
+        @include p-unit-rem($property, $value);
       }
 
       @include expect {
-        line-height: 2rem;
-      }
-    }
-  }
-}
-
-@include test-module("p-rem [mixin]") {
-  @include test("Should output style ruleS containing rem values w/ fallback rule.") {
-    $p-unit-global: "px" !global;
-
-    @include assert {
-      @include output {
-        $rules: ("font-size": 14px, "line-height": 32px);
-
-        @include p-rem($rules);
-      }
-
-      @include expect {
-        //noinspection CssOverwrittenProperties
-        font-size: 14px;
-        //noinspection CssOverwrittenProperties
-        font-size: 0.875rem;
-        //noinspection CssOverwrittenProperties
-        line-height: 32px;
-        //noinspection CssOverwrittenProperties
-        line-height: 2rem;
-      }
-    }
-  }
-
-  @include test("Should output style ruleS containing rem values.") {
-    $p-unit-global: "rem" !global;
-
-    @include assert {
-      @include output {
-        $rules: ("font-size": 14px, "line-height": 32px);
-
-        @include p-rem($rules);
-      }
-
-      @include expect {
-        font-size: 0.875rem;
         line-height: 2rem;
       }
     }

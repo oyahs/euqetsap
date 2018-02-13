@@ -1,6 +1,11 @@
 {
   "serve": {
-    "_": "serve"
+    "development": {
+      "options": {
+        "open": false,
+        "notify": false
+      }
+    }
   },
   "style": {
     "_": "style",
@@ -9,12 +14,6 @@
         "outputStyle": "expanded",
         "precision": 10
       }
-    }
-  },
-  "rev": {
-    "_": "rev",
-    "options": {
-      "merge": true
     }
   }
 }

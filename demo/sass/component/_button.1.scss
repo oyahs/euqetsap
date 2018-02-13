@@ -1,0 +1,23 @@
+.demo-button {
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  padding: 0 0.75em;
+  margin: 0 auto;
+  text-align: center;
+  user-select: none; // stylelint-disable-line plugin/no-unsupported-browser-features
+  background-color: transparent;
+  border: 0;
+  @include p-font-size(16px);
+  @include p-line-height(3);
+}
+
+.demo-button::-moz-focus-inner {
+  padding: 0;
+  border: 0;
+}
+
+.demo-button:focus {
+  outline: 1px dotted; // stylelint-disable-line plugin/no-unsupported-browser-features
+  outline: 5px auto -webkit-focus-ring-color; // stylelint-disable-line plugin/no-unsupported-browser-features
+}

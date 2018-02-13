@@ -1,0 +1,151 @@
+/* stylelint-disable selector-max-type */
+
+@include p-baseline-teque-set("heading", ("family": ("Open Sans", sans-serif), "style": "normal", "weight": 300, "cap-height": 0.72,));
+
+@include p-baseline-teque-set("body", ("family": ("Open Sans", sans-serif), "style": "normal", "weight": 400, "cap-height": 0.72,));
+
+html {
+  @include p-establish-baseline;
+}
+
+main {
+  max-width: 94%;
+  min-height: 100%;
+  margin: 0 auto;
+}
+
+main::before,
+main::after {
+  display: table;
+  content: " ";
+}
+
+main::after {
+  clear: both;
+}
+
+body {
+  position: relative;
+  @include p-font-size(16px);
+
+  @each $key, $value in map-get($p-baseline-teque, "body") {
+    @if (index(("family", "style", "weight"), $key) != null) {
+      #{unquote("font-#{$key}")}: if($key == "style", unquote($value), $value);
+    }
+  }
+}
+
+@if ($p-debug-toggle) {
+  body::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 9000;
+    display: block;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    content: "";
+    @include p-debug($p-debug-color);
+  }
+
+  body:active::after {
+    display: none;
+  }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  @each $key, $value in map-get($p-baseline-teque, "heading") {
+    @if (index(("family", "style", "weight"), $key) != null) {
+      #{unquote("font-#{$key}")}: if($key == "style", unquote($value), $value);
+    }
+  }
+}
+
+h1 {
+  @include p-type-to-baseline(54px, "heading", $trailer: 2);
+  @include p-margin-top;
+}
+
+h2 {
+  @include p-type-to-baseline(36px, "heading", $trailer: 1);
+  @include p-margin-top;
+}
+
+h3 {
+  margin-bottom: 0;
+  @include p-type-to-baseline(24px, "heading");
+  @include p-margin-top;
+}
+
+h4 {
+  margin-bottom: 0;
+  @include p-type-to-baseline(16px, "heading");
+  @include p-margin-top;
+}
+
+h5,
+h6 {
+  margin-bottom: 0;
+  @include p-type-to-baseline(11px, "heading");
+  @include p-margin-top;
+}
+
+p,
+ul,
+ol,
+pre,
+table,
+blockquote {
+  margin-top: 0;
+  @include p-type-to-baseline(16px, "body", $trailer: 1);
+}
+
+ul,
+ol {
+  & & {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}
+
+hr {
+  width: 100%;
+  height: 0;
+  margin: 0;
+  clear: both;
+  border: 0;
+  @include p-border-bottom;
+}
+
+a,
+b,
+i,
+strong,
+em,
+small,
+code {
+  line-height: 0;
+}
+
+sub,
+sup {
+  position: relative;
+  line-height: 0;
+  vertical-align: baseline;
+}
+
+sup {
+  top: -0.5em;
+}
+
+sub {
+  bottom: -0.25em;
+}
+
+/* stylelint-enable selector-max-type */

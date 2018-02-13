@@ -1,0 +1,10 @@
+{
+  "_": "./",
+  "package": "./package",
+  "demo": "./demo",
+  "tmp": "./.tmp",
+  "test": {
+    "_": "./test",
+    "sass": "./test/sass"
+  }
+}
