@@ -1,7 +1,11 @@
 //
-// pasteque
-// 0.0.3
-// Beautify typography. Pasteque is a fork from Compass/typography.
+// pasteque-baseline
+//
+// 0.0.6
+//
+// Beautify typography:
+// Aligning to baseline.
+//
 // Zaza Agency <hi@zaza.africa> (zaza.africa)
 //
 // This work is licensed under the Creative Commons
@@ -9,58 +13,31 @@
 // of this license, visit http://creativecommons.org/licenses/by/4.0/.
 //
 
-@mixin before-test-aligning-to-baseline {
-  $p-fonteque: map-merge($p-fonteque, ("test": ("family": sans-serif, "cap-height": 0.72))) !global;
+@mixin before-test-baseline {
+  $p-baseline-teque: map-merge($p-baseline-teque, ("test": ("family": sans-serif, "cap-height": 0.72))) !global;
 }
 
-@include before-test-aligning-to-baseline;
+@include before-test-baseline;
 
-@include test-module("p-shift-value [function]") {
+@include test-module("p-baseline-shift [function]") {
   @include test("Should return distance to shift text down.") {
     $to: 100px;
-    $cap-height: map-get(map-get($p-fonteque, "test"), "cap-height") * 1em;
-    $output: p-shift-value($to, $cap-height);
+    $cap-height: map-get(map-get($p-baseline-teque, "test"), "cap-height") * 1em;
+    $output: p-baseline-shift($to, $cap-height);
     $expect: 1.25rem;
 
     @include assert-equal($output, $expect);
   }
 }
 
-@include test-module("p-fonteque-get [mixin]") {
-  @include test("Should output style rules of `$key`'s family font.") {
-    @include assert {
-      @include output {
-        @include p-fonteque-get("test");
-      }
-
-      @include expect {
-        font-family: sans-serif;
-      }
-    }
-  }
-
-  @include test("Should output fallback font style rules.") {
-    @include assert {
-      @include output {
-        @include p-fonteque-get("if-it-does-not-exist", ("style": "italic", "weight": "bold"));
-      }
-
-      @include expect {
-        font-style: italic;
-        font-weight: bold;
-      }
-    }
-  }
-}
-
-@include test-module("p-adjust-padding-leader [mixin]") {
+@include test-module("p-baseline-leader [mixin]") {
   @include test("Should output correct padding-top to move the text downwards.") {
     @include assert {
       @include output {
         $to: 100px;
         $font: "test";
 
-        @include p-adjust-padding-leader($to, $font);
+        @include p-baseline-leader($to, $font);
       }
 
       @include expect {
@@ -70,14 +47,14 @@
   }
 }
 
-@include test-module("p-adjust-trailing-whitespace [mixin]") {
+@include test-module("p-baseline-trailer [mixin]") {
   @include test("Should output correct margin-bottom to fix vertical rhythm for elements below.") {
     @include assert {
       @include output {
         $to: 100px;
         $font: "test";
 
-        @include p-adjust-trailing-whitespace($to, $font);
+        @include p-baseline-trailer($to, $font);
       }
 
       @include expect {
