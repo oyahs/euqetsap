@@ -1,0 +1,10 @@
+{
+  "name": "pasteque",
+  "version": "0.0.6",
+  "description": "Beautify typography. pasteque is a fork from Compass typography.",
+  "author": "Zaza Agency <hi@zaza.africa> (zaza.africa)",
+  "license": "CC-BY-4.0",
+  "dependencies": {
+    "pasteque-unit": "^0.0.6"
+  }
+}

@@ -4,10 +4,10 @@ const merge = require('lodash/object').merge;
 
 const sassTrue = require('sass-true');
 
-const dir = require('../mawqie');
+const dir = require('../shajara');
 
 const task = require('../task/task');
 
 sassTrue.runSass(merge(task.style.sass.options, {
-  file: path.resolve(`${dir.src.sass._}/test.scss`.replace(dir.src._, './test'))
+  file: path.resolve(__dirname, `.${dir.test.sass}/test.scss`)
 }), describe, it);

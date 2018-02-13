@@ -1,8 +1,21 @@
-# 🍉 pasteque
+# pasteque-baseline
 
 ###### 0.0.6
 
-Pasteque's modules repository.
+Beautify typography:
+* Aligning to baseline.
+
+### Installation
+
+```
+$ npm install pasteque-baseline
+```
+
+### Usage
+
+```scss
+@import "path/to/node_modules/pasteque-baseline/sass/p-baseline";
+```
 
 ### Author
 
