@@ -1,0 +1,20 @@
+.Button {
+  display: block;
+  margin: 0 auto;
+  border: 0;
+}
+
+.typography--button {
+  font-weight: 500;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  @include p-font-size(14px, 3);
+}
+
+.typography--button.typography--aligning-type-to-baseline {
+  font-family: map-get($font--body, "family");
+  font-style: unquote(map-get($font--body, "style"));
+  font-weight: map-get($font--body, "weight");
+  @include p-adjust-component-horizontal-padding(14px, $font--body);
+}

@@ -1,22 +1,20 @@
-# pasteque-unit
+# pasteque-all
 
-###### 0.0.6
+###### 0.0.7
 
 Beautify typography:
-* Unit.
-
-**pasteque-unit** is a fork from [**Compass**](https://github.com/Compass/compass).
+* Aligning to baseline.
 
 ### Installation
 
 ```
-$ npm install pasteque-unit
+$ npm install pasteque-all
 ```
 
 ### Usage
 
 ```scss
-@import "path/to/node_modules/pasteque-unit/sass/p-unit";
+@import "path/to/node_modules/pasteque-all/a";
 ```
 
 ### Author

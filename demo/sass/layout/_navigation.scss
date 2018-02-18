@@ -1,0 +1,11 @@
+.l-navigation {
+  top: 0;
+  right: 0;
+  width: 100%;
+  @include p-unit-rem("height", p-rhythm(3));
+}
+
+.l-navigation + * {
+  z-index: 1;
+  @include p-padding-top(3);
+}

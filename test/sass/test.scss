@@ -1,7 +1,10 @@
 // Vendor
 @import "true";
-@import "../../package/pasteque-unit/sass/p-unit";
-@import "../../package/pasteque/sass/p-typography";
 
-@import "p-unit";
-@import "p-typography";
+// Package
+@import "package/unit/u";
+@import "package/all/a";
+
+@import "u";
+@import "p";
+@import "a";

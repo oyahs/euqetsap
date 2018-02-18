@@ -1,0 +1,10 @@
+{
+  "name": "pasteque-all",
+  "version": "0.0.7",
+  "description": "Beautify typography: Aligning to baseline.",
+  "author": "Zaza Agency <hi@zaza.africa> (zaza.africa)",
+  "license": "CC-BY-4.0",
+  "dependencies": {
+    "pasteque": "^0.0.7"
+  }
+}

@@ -1,0 +1,100 @@
+//
+// pasteque-unit
+//
+// 0.0.7
+//
+// Beautify typography:
+// Unit.
+// pasteque-unit is a fork from Compass typography.
+//
+// Zaza Agency <hi@zaza.africa> (zaza.africa)
+//
+// This work is licensed under the Creative Commons
+// Attribution 4.0 International License. To view a copy
+// of this license, visit http://creativecommons.org/licenses/by/4.0/.
+//
+
+@mixin before-test-unit {
+  $_PSTQ_: map-merge(if(global-variable-exists("_PSTQ_"), $_PSTQ_, ()), (
+    "UNIT": (
+      "BROWSER_DEFAULT_FONT_SIZE": 16px,
+    ),
+  )) !global;
+}
+
+@include before-test-unit;
+
+@include test-module("p-unit-convert [function]") {
+  @include test("Should return new converted value relative to root font-size.") {
+    $length: 1px;
+    $unit: "rem";
+    $output: p-unit-convert($length, $unit);
+    $expect: 0.0625rem;
+
+    @include assert-equal($output, $expect);
+  }
+
+  @include test("Should return a new converted value relative to new `$from` assigned value.") {
+    $length: 1rem;
+    $unit: "em";
+    $from: 144px;
+    $output: p-unit-convert($length, $unit, $from);
+    $expect: 0.111111111111111em;
+
+    @include assert-equal($output, $expect);
+  }
+}
+
+@include test-module("_p-unit-px-rem [function]") {
+  @include test("Should return a px/rem versions of (number) `$value`.") {
+    $value: 2.35px;
+    $output: _p-unit-px-rem($value);
+    $expect: ("px": 2px, "rem": 0.146875rem);
+
+    @include assert-equal($output, $expect);
+  }
+}
+
+@include test-module("p-unit-px-rem [function]") {
+  @include test("Should return a px/rem versions of (nested list) `$value`.") {
+    $value: (3rem, (5px, 8.13rem), 21px);
+    $output: p-unit-px-rem($value);
+    $expect: ("px": (48px, (5px, 130px), 21px), "rem": (3rem, (0.3125rem, 8.13rem), 1.3125rem));
+
+    @include assert-equal($output, $expect);
+  }
+}
+
+@include test-module("p-unit-rem [mixin]") {
+  @include test("Should output style rules containing rem values.") {
+    @include assert {
+      @include output {
+        $property: "font-size";
+        $value: 34px;
+
+        @include p-unit-rem($property, $value);
+      }
+
+      @include expect {
+        font-size: 2.125rem;
+      }
+    }
+  }
+
+  @include test("Should output style rules containing rem values w/ px fallback rule.") {
+    @include assert {
+      @include output {
+        $property: "line-height";
+        $value: 5.5rem;
+        $fallback: true;
+
+        @include p-unit-rem($property, $value, $fallback);
+      }
+
+      @include expect {
+        line-height: 88px;
+        line-height: 5.5rem;
+      }
+    }
+  }
+}

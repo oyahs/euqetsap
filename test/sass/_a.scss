@@ -1,0 +1,147 @@
+//
+// pasteque-all
+//
+// 0.0.7
+//
+// Beautify typography:
+// Aligning to baseline.
+//
+// Zaza Agency <hi@zaza.africa> (zaza.africa)
+//
+// This work is licensed under the Creative Commons
+// Attribution 4.0 International License. To view a copy
+// of this license, visit http://creativecommons.org/licenses/by/4.0/.
+//
+
+@mixin before-test-aligning {
+  $p-typeface-global: (
+    "family": ("Open Sans", sans-serif),
+    "weight": 400,
+    "style": "normal",
+    "cap-height": 0.72em
+  ) !global;
+}
+
+@include before-test-aligning;
+
+@include test-module("p-shift-value [function]") {
+  @include test("Should return distance to shift text down.") {
+    $to: 144px;
+    $cap-height: map-get($p-typeface-global, "cap-height");
+    $output: p-shift-value($to, $cap-height);
+    $expect: 1.26rem;
+
+    @include assert-equal($output, $expect);
+  }
+}
+
+@include test-module("p-padding-top-to-move-text-down [mixin]") {
+  @include test("Should output correct padding-top to move the text downwards.") {
+    @include assert {
+      @include output {
+        $to: 144px;
+        $typeface: $p-typeface-global;
+
+        @include p-padding-top-to-move-text-down($to, $typeface);
+      }
+
+      @include expect {
+        padding-top: 1.26rem;
+      }
+    }
+  }
+
+  @include test("Should output correct padding-top to move the text downwards w/ new assigned `$lines` value.") {
+    @include assert {
+      @include output {
+        $to: 144px;
+        $typeface: $p-typeface-global;
+        $lines: 3;
+
+        @include p-padding-top-to-move-text-down($to, $typeface, $lines);
+      }
+
+      @include expect {
+        padding-top: 3.26rem;
+      }
+    }
+  }
+}
+
+@include test-module("p-trailing-whitespace-to-keep-rhythm [mixin]") {
+  @include test("Should output correct trailing whitespace as margin to maintain rhythm.") {
+    @include assert {
+      @include output {
+        $to: 144px;
+        $typeface: $p-typeface-global;
+
+        @include p-trailing-whitespace-to-keep-rhythm($to, $typeface);
+      }
+
+      @include expect {
+        margin-bottom: 1.74rem;
+      }
+    }
+  }
+
+  @include test("Should output correct trailing whitespace as padding w/ new assigned `$lines` value.") {
+    @include assert {
+      @include output {
+        $to: 144px;
+        $typeface: $p-typeface-global;
+        $lines: 3;
+        $property: "padding";
+
+        @include p-trailing-whitespace-to-keep-rhythm($to, $typeface, $lines, $property);
+      }
+
+      @include expect {
+        padding-bottom: 2.74rem;
+      }
+    }
+  }
+}
+
+@include test-module("p-aligning-type-to-baseline [mixin]") {
+  @include test("Should output padding-top to move text downwards and margin-bottom to maintain rhythm.") {
+    @include assert {
+      @include output {
+        $to: 14px;
+        $typeface: $p-typeface-global;
+
+        @include p-aligning-type-to-baseline($to, $typeface);
+      }
+
+      @include expect {
+        font-size: 0.875rem;
+        line-height: 2rem;
+        padding-top: 0.685rem;
+        margin-bottom: 0.315rem;
+
+        & + * {
+          margin-top: 0;
+        }
+      }
+    }
+  }
+}
+
+@include test-module("p-adjust-component-horizontal-padding [mixin]") {
+  @include test("Should output padding-top to move text downwards and margin-bottom to maintain rhythm.") {
+    @include assert {
+      @include output {
+        $to: 14px;
+        $typeface: $p-typeface-global;
+
+        @include p-adjust-component-horizontal-padding($to, $typeface);
+      }
+
+      @include expect {
+        font-size: 0.875rem;
+        line-height: 2rem;
+        padding-top: 0.685rem;
+        padding-bottom: 0.315rem;
+      }
+    }
+  }
+}

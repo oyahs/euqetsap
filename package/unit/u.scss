@@ -1,11 +1,11 @@
 //
 // pasteque-unit
 //
-// 0.0.5
+// 0.0.7
 //
 // Beautify typography:
 // Unit.
-// pasteque-unit is a fork from Compass.
+// pasteque-unit is a fork from Compass typography.
 //
 // Zaza Agency <hi@zaza.africa> (zaza.africa)
 //
@@ -18,7 +18,7 @@
 /// pasteque-unit constants.
 /// @access private
 /// @author Zaza Agency <hi@zaza.africa> (zaza.africa)
-/// @property {Map} "UNIT" [("BROWSER_DEFAULT_FONT_SIZE": 16px)]
+/// @property {Number} "BROWSER_DEFAULT_FONT_SIZE" [16px]
 /// @type Map
 $_PSTQ_: map-merge(if(global-variable-exists("_PSTQ_"), $_PSTQ_, ()), (
   "UNIT": (
@@ -32,6 +32,12 @@ $_PSTQ_: map-merge(if(global-variable-exists("_PSTQ_"), $_PSTQ_, ()), (
 /// @link http://compass-style.org/reference/compass/typography/
 /// @type String
 $p-unit-global: "rem" !default;
+
+/// Output fallback in px.
+/// @author Compass
+/// @link http://compass-style.org/reference/compass/typography/
+/// @type Bool
+$p-unit__rem--w-fallback: false !default;
 
 /// Convert any CSS `length` or `percentage` value to any another.
 /// @author Compass
@@ -51,17 +57,17 @@ $p-unit-global: "rem" !default;
     @return $length;
   }
 
-  $browser-default-font-size: map-get(map-get($_PSTQ_, "UNIT"), "BROWSER_DEFAULT_FONT_SIZE");
+  $root-size: map-get(map-get($_PSTQ_, "UNIT"), "BROWSER_DEFAULT_FONT_SIZE");
 
   @if (type-of($from) == "number") {
     @if (unit($from) != "px") {
       @warn "$from must resolve to a value in px.";
 
-      $from: $browser-default-font-size;
+      $from: $root-size;
     }
   }
   @else {
-    $from: $browser-default-font-size;
+    $from: $root-size;
   }
 
   $non-convertible-unit: "ch", "vw", "vh", "vmin"; // stylelint-disable-line plugin/no-unsupported-browser-features
@@ -72,7 +78,7 @@ $p-unit-global: "rem" !default;
       $length-to-px: ($length / 1em) * $from;
     }
     @else if ($length-unit == "rem") {
-      $length-to-px: ($length / 1rem) * $browser-default-font-size;
+      $length-to-px: ($length / 1rem) * $root-size;
     }
     @else if ($length-unit == "%") {
       $length-to-px: ($length / 100%) * $from;
@@ -102,7 +108,7 @@ $p-unit-global: "rem" !default;
       $_return: ($length-to-px / $from) * 1em;
     }
     @else if ($unit == "rem") {
-      $_return: ($length-to-px / $browser-default-font-size) * 1rem;
+      $_return: ($length-to-px / $root-size) * 1rem;
     }
     @else if ($unit == "%") {
       $_return: ($length-to-px / $from) * 100%;
@@ -200,12 +206,13 @@ $p-unit-global: "rem" !default;
 /// @link http://compass-style.org/reference/compass/typography/
 /// @parameter {String} $property - Css property name.
 /// @parameter {List|Number} $value - Value or list of values for the property.
-@mixin p-unit-rem($property, $value) {
+/// @parameter {Bool} $fallback [$p-unit__rem--w-fallback] - Use px fallback.
+@mixin p-unit-rem($property, $value, $fallback: $p-unit__rem--w-fallback) {
   $eulav: p-unit-px-rem($value);
   $px-value: map-get($eulav, "px");
   $rem-value: map-get($eulav, "rem");
 
-  @if ($p-unit-global == "px") and ($px-value != $rem-value) {
+  @if ($fallback) and ($px-value != $rem-value) {
     #{unquote($property)}: $px-value;
   }
 

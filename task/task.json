@@ -12,7 +12,10 @@
     "sass": {
       "options": {
         "outputStyle": "expanded",
-        "precision": 10
+        "precision": 10,
+        "includePaths": [
+          "."
+        ]
       }
     }
   }

@@ -1,7 +1,7 @@
 //
 // pasteque
 //
-// 0.0.6
+// 0.0.7
 //
 // Beautify typography.
 // pasteque is a fork from Compass typography.
@@ -13,18 +13,19 @@
 // of this license, visit http://creativecommons.org/licenses/by/4.0/.
 //
 
-@import "../../pasteque-unit/sass/p-unit";
+// @import "../pasteque-unit/u";
+@import "../unit/u";
 
 /* stylelint-disable */
 /// pasteque constants.
 /// @access private
 /// @author Zaza Agency <hi@zaza.africa> (zaza.africa)
 /// @property {Number} "LINE_UNIT" [8px]
-/// @property {Number} "LINE_MULTI" [4]
+/// @property {Number} "LINE_MULTI" [2]
 /// @type Map
 $_PSTQ_: map-merge(if(global-variable-exists("_PSTQ_"), $_PSTQ_, ()), (
   "LINE_UNIT": 8px,
-  "LINE_MULTI": 4,
+  "LINE_MULTI": 2,
 )) !global;
 /* stylelint-enable */
 
@@ -69,8 +70,7 @@ $p-debug-color: #f00 !default;
 /// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
 /// @return {Number} Rhythm.
 @function p-rhythm($lines: 1, $minus: 0, $from: null) {
-  $line-height: map-get($_PSTQ_, "LINE_UNIT") * map-get($_PSTQ_, "LINE_MULTI") / 2;
-  $_return: p-unit-convert((($lines * $line-height) - $minus), $p-unit-global, $from);
+  $_return: p-unit-convert(((ceil($lines) * (map-get($_PSTQ_, "LINE_UNIT") * map-get($_PSTQ_, "LINE_MULTI"))) - $minus), $p-unit-global, $from);
 
   @if (unit($_return) == "px") {
     $_return: floor($_return);
@@ -92,9 +92,7 @@ $p-debug-color: #f00 !default;
 /// @parameter {Number} $from
 /// @return {Number} Multiple of rhythm units.
 @function _p-lines-for($from) {
-  $line-height: map-get($_PSTQ_, "LINE_UNIT") * map-get($_PSTQ_, "LINE_MULTI") / 2;
-
-  @return ceil($from / $line-height);
+  @return ceil($from / (map-get($_PSTQ_, "LINE_UNIT") * map-get($_PSTQ_, "LINE_MULTI")));
 }
 
 /// Calculate the minimum multiple of line-height units needed to contain a font-size.
@@ -107,7 +105,7 @@ $p-debug-color: #f00 !default;
 /// @return {Number} Multiple of line-height units.
 @function p-lines-for($from) {
   $_this: _p-lines-for($from);
-  $_return: map-get($_PSTQ_, "LINE_MULTI") / 2;
+  $_return: map-get($_PSTQ_, "LINE_MULTI");
 
   @if ($_this > $_return) {
     $_return: $_this;
@@ -122,8 +120,10 @@ $p-debug-color: #f00 !default;
 ///   @include p-establish-baseline;
 /// @link http://compass-style.org/reference/compass/typography/
 @mixin p-establish-baseline {
-  font-size: 100%;
-  line-height: p-unit-convert(map-get($_PSTQ_, "LINE_UNIT") * map-get($_PSTQ_, "LINE_MULTI"), "em");
+  @at-root :root {
+    font-size: 100%;
+    line-height: p-unit-convert((map-get($_PSTQ_, "LINE_UNIT") * map-get($_PSTQ_, "LINE_MULTI") * 2), "em");
+  }
 }
 
 /// Adjust a block to have different line height to maintain the rhythm.
@@ -134,19 +134,18 @@ $p-debug-color: #f00 !default;
 /// @parameter {Number} $lines - Multiples of baseline rhythm.
 /// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
 @mixin p-line-height($lines, $from: null) {
-  $default: map-get($_PSTQ_, "LINE_MULTI") / 2;
+  $_lines: map-get($_PSTQ_, "LINE_MULTI");
 
   @if (unitless($lines)) {
-    @if ($lines > $default) {
-      $default: $lines;
+    @if ($lines > $_lines) {
+      $_lines: $lines;
     }
   }
   @else {
-    $lines: p-unit-convert($lines, "px", $from);
-    $default: p-lines-for($lines);
+    $_lines: p-lines-for(p-unit-convert($lines, "px", $from));
   } // stylelint-disable-next-line no-eol-whitespace
   
-  @include p-unit-rem("line-height", p-rhythm($default, 0, $from));
+  @include p-unit-rem("line-height", p-rhythm($_lines, 0, $from));
 }
 
 /// Adjust a block to have a different font size and line height to maintain the rhythm.
@@ -157,10 +156,15 @@ $p-debug-color: #f00 !default;
 ///   @include p-font-size(0);
 /// @link http://compass-style.org/reference/compass/typography/
 /// @parameter {Number} $to
+/// @parameter {Null|Number} $lines [null] - Multiples of baseline rhythm.
 /// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
-@mixin p-font-size($to, $from: null) {
+@mixin p-font-size($to, $lines: null, $from: null) {
+  @if (type-of($lines) != "number") {
+    $lines: $to;
+  }
+
   @include p-unit-rem("font-size", p-unit-convert($to, $p-unit-global, $from));
-  @include p-line-height($to, $from);
+  @include p-line-height($lines, $from);
 }
 
 /// Apply leading whitespace as padding.
@@ -174,7 +178,7 @@ $p-debug-color: #f00 !default;
 /// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
 @mixin p-padding-top($lines: 1, $from: null) {
   @if (not unitless($lines)) {
-    $lines: _p-lines-for($lines);
+    $lines: _p-lines-for(p-unit-convert($lines, "px", $from));
   }
 
   @include p-unit-rem("padding-top", p-rhythm($lines, 0, $from));
@@ -191,7 +195,7 @@ $p-debug-color: #f00 !default;
 /// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
 @mixin p-padding-bottom($lines: 1, $from: null) {
   @if (not unitless($lines)) {
-    $lines: _p-lines-for($lines);
+    $lines: _p-lines-for(p-unit-convert($lines, "px", $from));
   }
 
   @include p-unit-rem("padding-bottom", p-rhythm($lines, 0, $from));
@@ -213,42 +217,40 @@ $p-debug-color: #f00 !default;
 @mixin p-padding($top: 1, $right: 0, $bottom: $top, $left: $right, $from: null) {
   $value: ();
 
-  @each $key, $eulav in ("top": $top, "right": $right, "bottom": $bottom, "left": $left) {
-    @if (not unitless($eulav)) {
-      $eulav: _p-lines-for($eulav);
+  @each $key, $_value in ("top": $top, "right": $right, "bottom": $bottom, "left": $left) {
+    @if (not unitless($_value)) {
+      $_value: _p-lines-for(p-unit-convert($_value, "px", $from));
     }
 
-    $rhythm: p-rhythm($eulav, 0, $from);
-
-    @if ($rhythm > 0) {
-      $value: map-merge($value, ($key: $rhythm));
+    @if ($_value > 0) {
+      $value: map-merge($value, ($key: $_value));
     }
   }
 
   @if (map-get($value, "top") == map-get($value, "right")) and (map-get($value, "top") == map-get($value, "bottom")) and (map-get($value, "top") == map-get($value, "left")) {
-    @include p-unit-rem("padding", map-get($value, "top"));
+    @include p-unit-rem("padding", p-rhythm(map-get($value, "top"), 0, $from));
   }
   @else if (map-has-key($value, "top")) and (map-get($value, "top") == map-get($value, "bottom")) and (map-has-key($value, "right")) and (map-get($value, "right") == map-get($value, "left")) {
-    @include p-unit-rem("padding", map-get($value, "top") map-get($value, "right"));
+    @include p-unit-rem("padding", (p-rhythm(map-get($value, "top"), 0, $from) p-rhythm(map-get($value, "right"), 0, $from)));
   }
   @else if (map-has-key($value, "top")) and (map-has-key($value, "right")) and (map-has-key($value, "bottom")) and (map-has-key($value, "left")) {
-    @include p-unit-rem("padding", map-get($value, "top") map-get($value, "right") map-get($value, "bottom") map-get($value, "left"));
+    @include p-unit-rem("padding", (p-rhythm(map-get($value, "top"), 0, $from) p-rhythm(map-get($value, "right"), 0, $from) p-rhythm(map-get($value, "bottom"), 0, $from) p-rhythm(map-get($value, "left"), 0, $from)));
   }
   @else {
     @if (map-has-key($value, "top")) {
-      @include p-unit-rem("padding-top", map-get($value, "top"));
+      @include p-unit-rem("padding-top", p-rhythm(map-get($value, "top"), 0, $from));
     }
 
     @if (map-has-key($value, "right")) {
-      @include p-unit-rem("padding-right", map-get($value, "right"));
+      @include p-unit-rem("padding-right", p-rhythm(map-get($value, "right"), 0, $from));
     }
 
     @if (map-has-key($value, "bottom")) {
-      @include p-unit-rem("padding-bottom", map-get($value, "bottom"));
+      @include p-unit-rem("padding-bottom", p-rhythm(map-get($value, "bottom"), 0, $from));
     }
 
     @if (map-has-key($value, "left")) {
-      @include p-unit-rem("padding-left", map-get($value, "left"));
+      @include p-unit-rem("padding-left", p-rhythm(map-get($value, "left"), 0, $from));
     }
   }
 }
@@ -263,7 +265,7 @@ $p-debug-color: #f00 !default;
 /// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
 @mixin p-margin-top($lines: 1, $from: null) {
   @if (not unitless($lines)) {
-    $lines: _p-lines-for($lines);
+    $lines: _p-lines-for(p-unit-convert($lines, "px", $from));
   }
 
   @include p-unit-rem("margin-top", p-rhythm($lines, 0, $from));
@@ -280,7 +282,7 @@ $p-debug-color: #f00 !default;
 /// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
 @mixin p-margin-bottom($lines: 1, $from: null) {
   @if (not unitless($lines)) {
-    $lines: _p-lines-for($lines);
+    $lines: _p-lines-for(p-unit-convert($lines, "px", $from));
   }
 
   @include p-unit-rem("margin-bottom", p-rhythm($lines, 0, $from));
@@ -302,42 +304,40 @@ $p-debug-color: #f00 !default;
 @mixin p-margin($top: 1, $right: 0, $bottom: $top, $left: $right, $from: null) {
   $value: ();
 
-  @each $key, $eulav in ("top": $top, "right": $right, "bottom": $bottom, "left": $left) {
-    @if (not unitless($eulav)) {
-      $eulav: _p-lines-for($eulav);
+  @each $key, $_value in ("top": $top, "right": $right, "bottom": $bottom, "left": $left) {
+    @if (not unitless($_value)) {
+      $_value: _p-lines-for(p-unit-convert($_value, "px", $from));
     }
 
-    $rhythm: p-rhythm($eulav, 0, $from);
-
-    @if ($rhythm != 0) {
-      $value: map-merge($value, ($key: $rhythm));
+    @if ($_value != 0) {
+      $value: map-merge($value, ($key: $_value));
     }
   }
 
   @if (map-get($value, "top") == map-get($value, "right")) and (map-get($value, "top") == map-get($value, "bottom")) and (map-get($value, "top") == map-get($value, "left")) {
-    @include p-unit-rem("margin", map-get($value, "top"));
+    @include p-unit-rem("margin", p-rhythm(map-get($value, "top"), 0, $from));
   }
   @else if (map-has-key($value, "top")) and (map-get($value, "top") == map-get($value, "bottom")) and (map-has-key($value, "right")) and (map-get($value, "right") == map-get($value, "left")) {
-    @include p-unit-rem("margin", map-get($value, "top") map-get($value, "right"));
+    @include p-unit-rem("margin", (p-rhythm(map-get($value, "top"), 0, $from) p-rhythm(map-get($value, "right"), 0, $from)));
   }
   @else if (map-has-key($value, "top")) and (map-has-key($value, "right")) and (map-has-key($value, "bottom")) and (map-has-key($value, "left")) {
-    @include p-unit-rem("margin", map-get($value, "top") map-get($value, "right") map-get($value, "bottom") map-get($value, "left"));
+    @include p-unit-rem("margin", (p-rhythm(map-get($value, "top"), 0, $from) p-rhythm(map-get($value, "right"), 0, $from) p-rhythm(map-get($value, "bottom"), 0, $from) p-rhythm(map-get($value, "left"), 0, $from)));
   }
   @else {
     @if (map-has-key($value, "top")) {
-      @include p-unit-rem("margin-top", map-get($value, "top"));
+      @include p-unit-rem("margin-top", p-rhythm(map-get($value, "top"), 0, $from));
     }
 
     @if (map-has-key($value, "right")) {
-      @include p-unit-rem("margin-right", map-get($value, "right"));
+      @include p-unit-rem("margin-right", p-rhythm(map-get($value, "right"), 0, $from));
     }
 
     @if (map-has-key($value, "bottom")) {
-      @include p-unit-rem("margin-bottom", map-get($value, "bottom"));
+      @include p-unit-rem("margin-bottom", p-rhythm(map-get($value, "bottom"), 0, $from));
     }
 
     @if (map-has-key($value, "left")) {
-      @include p-unit-rem("margin-left", map-get($value, "left"));
+      @include p-unit-rem("margin-left", p-rhythm(map-get($value, "left"), 0, $from));
     }
   }
 }
@@ -346,17 +346,17 @@ $p-debug-color: #f00 !default;
 /// @access private
 /// @author Compass
 /// @example
-///   @include p-apply-side-rhythm-border("all");
+///   @include _p-border("all");
 /// @example
-///   @include p-apply-side-rhythm-border("top", 1, 1px);
+///   @include _p-border("top", 1, 1px);
 /// @link http://compass-style.org/reference/compass/typography/
 /// @parameter {String} $side - String matching a css side keyword, e.g. `top`, `right`, `bottom`, `left` or all.
-/// @parameter {Number} $lines [1] - Multiples of baseline rhythm.
 /// @parameter {Number} $width [$p-border-width-global] - Border width.
+/// @parameter {Number} $lines [1] - Multiples of baseline rhythm.
 /// @parameter {String} $style [$p-border-style-global] - Border style.
 /// @parameter {Color} $color [$p-border-color-global] - Border color.
 /// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
-@mixin p-apply-side-rhythm-border($side, $lines: 1, $width: $p-border-width-global, $style: $p-border-style-global, $color: $p-border-color-global, $from: null) {
+@mixin _p-border($side, $width: $p-border-width-global, $lines: 1, $style: $p-border-style-global, $color: $p-border-color-global, $from: null) {
   $padding-property: "padding";
   $border-property: "border";
 
@@ -366,7 +366,7 @@ $p-debug-color: #f00 !default;
   }
 
   @if (not unitless($lines)) {
-    $lines: _p-lines-for($lines);
+    $lines: _p-lines-for(p-unit-convert($lines, "px", $from));
   }
 
   @include p-unit-rem($padding-property, p-rhythm($lines, $width, $from));
@@ -380,13 +380,13 @@ $p-debug-color: #f00 !default;
 /// @example
 ///   @include p-border(1, 1px);
 /// @link http://compass-style.org/reference/compass/typography/
-/// @parameter {Number} $lines [1] - Multiples of baseline rhythm.
 /// @parameter {Number} $width [$p-border-width-global] - Border width.
+/// @parameter {Number} $lines [1] - Multiples of baseline rhythm.
 /// @parameter {String} $style [$p-border-style-global] - Border style.
 /// @parameter {Color} $color [$p-border-color-global] - Border color.
 /// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
-@mixin p-border($lines: 1, $width: $p-border-width-global, $style: $p-border-style-global, $color: $p-border-color-global, $from: null) {
-  @include p-apply-side-rhythm-border("all", $lines, $width, $style, $color, $from);
+@mixin p-border($width: $p-border-width-global, $lines: 1, $style: $p-border-style-global, $color: $p-border-color-global, $from: null) {
+  @include _p-border("all", $width, $lines, $style, $color, $from);
 }
 
 /// Apply a leading border.
@@ -396,13 +396,13 @@ $p-debug-color: #f00 !default;
 /// @example
 ///   @include p-border-top(1, 1px);
 /// @link http://compass-style.org/reference/compass/typography/
-/// @parameter {Number} $lines [1] - Multiples of baseline rhythm.
 /// @parameter {Number} $width [$p-border-width-global] - Border width.
+/// @parameter {Number} $lines [1] - Multiples of baseline rhythm.
 /// @parameter {String} $style [$p-border-style-global] - Border style.
 /// @parameter {Color} $color [$p-border-color-global] - Border color.
 /// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
-@mixin p-border-top($lines: 1, $width: $p-border-width-global, $style: $p-border-style-global, $color: $p-border-color-global, $from: null) {
-  @include p-apply-side-rhythm-border("top", $lines, $width, $style, $color, $from);
+@mixin p-border-top($width: $p-border-width-global, $lines: 1, $style: $p-border-style-global, $color: $p-border-color-global, $from: null) {
+  @include _p-border("top", $width, $lines, $style, $color, $from);
 }
 
 /// Apply a trailing border.
@@ -412,34 +412,40 @@ $p-debug-color: #f00 !default;
 /// @example
 ///   @include p-border-bottom(1, 1px);
 /// @link http://compass-style.org/reference/compass/typography/
-/// @parameter {Number} $lines [1] - Multiples of baseline rhythm.
 /// @parameter {Number} $width [$p-border-width-global] - Border width.
+/// @parameter {Number} $lines [1] - Multiples of baseline rhythm.
 /// @parameter {String} $style [$p-border-style-global] - Border style.
 /// @parameter {Color} $color [$p-border-color-global] - Border color.
 /// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
-@mixin p-border-bottom($lines: 1, $width: $p-border-width-global, $style: $p-border-style-global, $color: $p-border-color-global, $from: null) {
-  @include p-apply-side-rhythm-border("bottom", $lines, $width, $style, $color, $from);
+@mixin p-border-bottom($width: $p-border-width-global, $lines: 1, $style: $p-border-style-global, $color: $p-border-color-global, $from: null) {
+  @include _p-border("bottom", $width, $lines, $style, $color, $from);
 }
 
 /// Show background-image used to debug vertical alignment.
 /// @author Zaza Agency <hi@zaza.africa> (zaza.africa)
 /// @example
-///   @include pasteque-debug;
+///   @include p-debug;
 /// @example
-///   @include pasteque-debug(#000);
+///   @include p-debug(#000);
 /// @parameter {Color} $color [$p-debug-color]
 @mixin p-debug($color: $p-debug-color) {
-  $line-unit: map-get($_PSTQ_, "LINE_UNIT");
-  $line-height: $line-unit * map-get($_PSTQ_, "LINE_MULTI") / 2;
-  $background-image: ();
-  $background-size: ();
-
-  @each $roloc, $rhythm in (rgba($color, 0.2), $line-unit), (rgba($color, 0.6), $line-height) {
-    $background-image: append($background-image, linear-gradient(to top, #{$roloc} #{percentage(1px / $rhythm)}, transparent #{percentage(1px / $rhythm)}), "comma");
-    $background-size: append($background-size, 100% p-unit-convert($rhythm, $p-unit-global), "comma");
+  $alpha: if(alpha($color) < 1, alpha($color), 0.6);
+  $rhythm: map-get($_PSTQ_, "LINE_UNIT");
+  $background-image: (linear-gradient(to top, #{rgba($color, ($alpha / 3))} #{percentage(1px / $rhythm)}, transparent #{percentage(1px / $rhythm)}),);
+  $background-size: (100% p-unit-convert($rhythm, $p-unit-global),); // stylelint-disable-next-line no-eol-whitespace
+  
+  @for $i from 1 through length(map-remove($_PSTQ_, "UNIT")) {
+    $key: nth(map-keys(map-remove($_PSTQ_, "UNIT")), $i); // stylelint-disable-next-line no-eol-whitespace
+    
+    @if ($key != "LINE_UNIT") {
+      $_rhythm: map-get($_PSTQ_, $key) * $rhythm;
+      $background-image: append($background-image, linear-gradient(to top, #{rgba($color, if(($i % 2) == 0, $alpha, ($alpha / 3)))} #{percentage(1px / $_rhythm)}, transparent #{percentage(1px / $_rhythm)}), "comma");
+      $background-size: append($background-size, 100% p-unit-convert($_rhythm, $p-unit-global), "comma");
+    }
   }
 
   background-image: $background-image;
-  background-position: top right;
+  background-position: top right; // stylelint-disable-next-line no-eol-whitespace
+  
   @include p-unit-rem("background-size", $background-size);
 }
