@@ -1,7 +1,7 @@
 //
 // pasteque
 //
-// 0.0.6
+// 0.0.7
 //
 // Beautify typography.
 // pasteque is a fork from Compass typography.
@@ -14,37 +14,53 @@
 //
 
 @mixin before-test-typography {
+  /* stylelint-disable */
+  $_PSTQ_: map-merge(if(global-variable-exists("_PSTQ_"), $_PSTQ_, ()), (
+    "LINE_UNIT": 8px,
+    "LINE_MULTI": 2,
+  )) !global;
+  /* stylelint-enable */
   $p-border-color-global: #ccc !global;
   $p-border-style-global: "solid" !global;
   $p-border-width-global: 1px !global;
+  $p-debug-color: #f00 !global;
 }
 
 @include before-test-typography;
 
 @include test-module("p-rhythm [function]") {
-  @include test("Should return default rhythm.") {
+  @include test("Should return default rhythm unit.") {
     $lines: 1;
-    $output: p-rhythm($lines);
+    $minus: 0;
+    $output: p-rhythm($lines, $minus);
     $expect: 1rem;
 
     @include assert-equal($output, $expect);
   }
 
-  @include test("Should return a multiple of line-height minus new assigned `$minus` value.") {
-    $lines: 3;
-    $minus: 5px;
+  @include test("Should return a multiple of rhythm units minus new assigned `$minus` value") {
+    $lines: 1;
+    $minus: 2px;
     $output: p-rhythm($lines, $minus);
-    $expect: 2.6875rem;
+    $expect: 0.875rem;
+    
+    @include assert-equal($output, $expect);
+  }
+
+  @include test("Should return a multiple of rhythm unit ceiling `$lines` value.") {
+    $lines: 3.4;
+    $output: p-rhythm($lines);
+    $expect: 4rem;
 
     @include assert-equal($output, $expect);
   }
 }
 
 @include test-module("_p-lines-for [function]") {
-  @include test("Should return minimum multiple rhythm units needed to contain `$from`.") {
-    $from: -24px;
+  @include test("Should return minimum multiple of rhythm units needed to contain `$from`.") {
+    $from: -144px;
     $output: _p-lines-for($from);
-    $expect: -1;
+    $expect: -9;
 
     @include assert-equal($output, $expect);
   }
@@ -52,7 +68,7 @@
 
 @include test-module("p-lines-for [function]") {
   @include test("Should return minimum multiple of line-height units needed to contain `$from`.") {
-    $from: 5px;
+    $from: 3px;
     $output: p-lines-for($from);
     $expect: 2;
 
@@ -60,28 +76,30 @@
   }
 }
 
-@include test-module("p-establish-baseline [mixin]") {
+@include test-module("p-establisb-baseline [mixin]") {
   @include test("Should output font baseline.") {
     @include assert {
-      @include output {
+      @include output($selector: false) {
         @include p-establish-baseline;
       }
 
-      @include expect {
-        font-size: 100%;
-        line-height: 2em;
+      @include expect($selector: false) {
+        :root {
+          font-size: 100%;
+          line-height: 2em;
+        }
       }
     }
   }
 }
 
 @include test-module("p-line-height [mixin]") {
-  @include test("Should output correct line-height to maintain rhythm w/ not unitless `$from` value.") {
+  @include test("Should output correct line-height to maintain rhythm w/ not unitless `$lines` value.") {
     @include assert {
       @include output {
-        $from: 14px;
+        $lines: 5px;
 
-        @include p-line-height($from);
+        @include p-line-height($lines);
       }
 
       @include expect {
@@ -90,16 +108,16 @@
     }
   }
 
-  @include test("Should output correct line-height to maintain rhythm w/ unitless `$from` value.") {
+  @include test("Should output correct line-height to maintain rhythm w/ unitless `$lines` value.") {
     @include assert {
       @include output {
-        $from: 1;
+        $lines: 8;
 
-        @include p-line-height($from);
+        @include p-line-height($lines);
       }
 
       @include expect {
-        line-height: 2rem;
+        line-height: 8rem;
       }
     }
   }
@@ -109,14 +127,30 @@
   @include test("Should output font-size and line-height.") {
     @include assert {
       @include output {
-        $to: 14px;
+        $to: 13px;
 
         @include p-font-size($to);
       }
 
       @include expect {
-        font-size: 0.875rem;
+        font-size: 0.8125rem;
         line-height: 2rem;
+      }
+    }
+  }
+
+  @include test("Should output font-size and correct line-height to maintain rhythm w/ new assigned `$lines` value.") {
+    @include assert {
+      @include output {
+        $to: 21px;
+        $lines: 8;
+
+        @include p-font-size($to, $lines);
+      }
+
+      @include expect {
+        font-size: 1.3125rem;
+        line-height: 8rem;
       }
     }
   }
@@ -125,14 +159,15 @@
     @include assert {
       @include output {
         $to: 0.6em;
-        $from: 122px;
+        $lines: null;
+        $from: 144px;
 
-        @include p-font-size($to, $from);
+        @include p-font-size($to, $lines, $from);
       }
 
       @include expect {
-        font-size: 4.575rem;
-        line-height: 5rem;
+        font-size: 5.4rem;
+        line-height: 6rem;
       }
     }
   }
@@ -142,13 +177,13 @@
   @include test("Should output leading whitespace as padding.") {
     @include assert {
       @include output {
-        $lines: 2;
+        $lines: 3.4;
 
         @include p-padding-top($lines);
       }
 
       @include expect {
-        padding-top: 2rem;
+        padding-top: 4rem;
       }
     }
   }
@@ -156,13 +191,13 @@
   @include test("Should output leading whitespace as padding w/ not unitless `$lines` value.") {
     @include assert {
       @include output {
-        $lines: 24px;
+        $lines: 55px;
 
         @include p-padding-top($lines);
       }
 
       @include expect {
-        padding-top: 2rem;
+        padding-top: 4rem;
       }
     }
   }
@@ -172,13 +207,13 @@
   @include test("Should output trailing whitespace as padding.") {
     @include assert {
       @include output {
-        $lines: 2;
+        $lines: 3.4;
 
         @include p-padding-bottom($lines);
       }
 
       @include expect {
-        padding-bottom: 2rem;
+        padding-bottom: 4rem;
       }
     }
   }
@@ -186,13 +221,13 @@
   @include test("Should output trailing whitespace as padding w/ not unitless `$lines` value.") {
     @include assert {
       @include output {
-        $lines: 24px;
+        $lines: 55px;
 
         @include p-padding-bottom($lines);
       }
 
       @include expect {
-        padding-bottom: 2rem;
+        padding-bottom: 4rem;
       }
     }
   }
@@ -202,16 +237,16 @@
   @include test("Should output padding shorthand to apply whitespace equally to all sides.") {
     @include assert {
       @include output {
-        $top: 1;
+        $top: 2;
         $right: $top;
         $bottom: $top;
-        $left: $right;
+        $left: $top;
 
         @include p-padding($top, $right, $bottom, $left);
       }
 
       @include expect {
-        padding: 1rem;
+        padding: 2rem;
       }
     }
   }
@@ -219,8 +254,8 @@
   @include test("Should output padding shorthand to apply horizontal and vertical whitespace.") {
     @include assert {
       @include output {
-        $top: 1;
-        $right: 2;
+        $top: 3;
+        $right: 5;
         $bottom: $top;
         $left: $right;
 
@@ -228,7 +263,7 @@
       }
 
       @include expect {
-        padding: 1rem 2rem;
+        padding: 3rem 5rem;
       }
     }
   }
@@ -236,16 +271,16 @@
   @include test("Should output padding shorthand to apply whitespace on each side.") {
     @include assert {
       @include output {
-        $top: 3;
-        $right: 5;
-        $bottom: 8;
-        $left: 13;
+        $top: 8;
+        $right: 13;
+        $bottom: 21;
+        $left: 34;
 
         @include p-padding($top, $right, $bottom, $left);
       }
 
       @include expect {
-        padding: 3rem 5rem 8rem 13rem;
+        padding: 8rem 13rem 21rem 34rem;
       }
     }
   }
@@ -253,8 +288,8 @@
   @include test("Should output horizontal whitespaces as padding.") {
     @include assert {
       @include output {
-        $top: 21;
-        $right: -34;
+        $top: 55;
+        $right: -89;
         $bottom: $top;
         $left: $right;
 
@@ -262,8 +297,8 @@
       }
 
       @include expect {
-        padding-top: 21rem;
-        padding-bottom: 21rem;
+        padding-top: 55rem;
+        padding-bottom: 55rem;
       }
     }
   }
@@ -273,13 +308,13 @@
   @include test("Should output leading whitespace as margin.") {
     @include assert {
       @include output {
-        $lines: 2;
+        $lines: 3.4;
 
         @include p-margin-top($lines);
       }
 
       @include expect {
-        margin-top: 2rem;
+        margin-top: 4rem;
       }
     }
   }
@@ -287,13 +322,13 @@
   @include test("Should output leading whitespace as margin w/ not unitless `$lines` value.") {
     @include assert {
       @include output {
-        $lines: 24px;
+        $lines: 55px;
 
         @include p-margin-top($lines);
       }
 
       @include expect {
-        margin-top: 2rem;
+        margin-top: 4rem;
       }
     }
   }
@@ -303,13 +338,13 @@
   @include test("Should output trailing whitespace as margin.") {
     @include assert {
       @include output {
-        $lines: 2;
+        $lines: 3.4;
 
         @include p-margin-bottom($lines);
       }
 
       @include expect {
-        margin-bottom: 2rem;
+        margin-bottom: 4rem;
       }
     }
   }
@@ -317,13 +352,13 @@
   @include test("Should output trailing whitespace as margin w/ not unitless `$lines` value.") {
     @include assert {
       @include output {
-        $lines: 24px;
+        $lines: 55px;
 
         @include p-margin-bottom($lines);
       }
 
       @include expect {
-        margin-bottom: 2rem;
+        margin-bottom: 4rem;
       }
     }
   }
@@ -333,16 +368,16 @@
   @include test("Should output margin shorthand to apply whitespace equally to all sides.") {
     @include assert {
       @include output {
-        $top: 1;
+        $top: 2;
         $right: $top;
         $bottom: $top;
-        $left: $right;
+        $left: $top;
 
         @include p-margin($top, $right, $bottom, $left);
       }
 
       @include expect {
-        margin: 1rem;
+        margin: 2rem;
       }
     }
   }
@@ -350,8 +385,8 @@
   @include test("Should output margin shorthand to apply horizontal and vertical whitespace.") {
     @include assert {
       @include output {
-        $top: 1;
-        $right: 2;
+        $top: 3;
+        $right: 5;
         $bottom: $top;
         $left: $right;
 
@@ -359,7 +394,7 @@
       }
 
       @include expect {
-        margin: 1rem 2rem;
+        margin: 3rem 5rem;
       }
     }
   }
@@ -367,16 +402,16 @@
   @include test("Should output margin shorthand to apply whitespace on each side.") {
     @include assert {
       @include output {
-        $top: 3;
-        $right: 5;
-        $bottom: 8;
-        $left: 13;
+        $top: 8;
+        $right: 13;
+        $bottom: 21;
+        $left: 34;
 
         @include p-margin($top, $right, $bottom, $left);
       }
 
       @include expect {
-        margin: 3rem 5rem 8rem 13rem;
+        margin: 8rem 13rem 21rem 34rem;
       }
     }
   }
@@ -384,7 +419,7 @@
   @include test("Should output horizontal whitespaces as margin.") {
     @include assert {
       @include output {
-        $top: 21;
+        $top: 55;
         $right: 0;
         $bottom: $top;
         $left: $right;
@@ -393,83 +428,115 @@
       }
 
       @include expect {
-        margin-top: 21rem;
-        margin-bottom: 21rem;
+        margin-top: 55rem;
+        margin-bottom: 55rem;
       }
     }
   }
 }
 
-@include test-module("p-apply-side-rhythm-border [mixin]") {
-  @include test("Should output border and whitespace to `$side` assigned value without destroying vertical rhythm.") {
+@include test-module("_p-border [mixin]") {
+  @include test("Should output border and whitespace to `$side` assigned value w/o destroying vertical rhythm.") {
     @include assert {
       @include output {
         $side: "bottom";
-        $lines: 24px;
-        $width: 3px;
+        $width: 1px;
+        $lines: 1;
 
-        @include p-apply-side-rhythm-border($side, $lines, $width);
+        @include _p-border($side, $width, $lines);
       }
 
       @include expect {
-        padding-bottom: 1.8125rem;
-        border-bottom: 0.1875rem solid #ccc;
+        padding-bottom: 0.9375rem;
+        border-bottom: 0.0625rem solid #ccc;
       }
     }
   }
 }
 
 @include test-module("p-border [mixin]") {
-  @include test("Should output borders and whitespace equally to all sides.") {
+  @include test("Should output borders and whitespaces equally to all sides.") {
     @include assert {
       @include output {
-        $lines: 2;
-        $width: 3px;
+        $width: 2px;
+        $lines: 3;
 
-        @include p-border($lines, $width);
+        @include p-border($width, $lines);
       }
 
       @include expect {
-        padding: 1.8125rem;
-        border: 0.1875rem solid #ccc;
+        padding: 2.875rem;
+        border: 0.125rem solid #ccc;
       }
     }
   }
 }
 
 @include test-module("p-border-top [mixin]") {
-  @include test("Should output leading border w/ new `$style` assigned value.") {
+  @include test("Should output leading border and whitespace w/ new `$style` assigned value.") {
     @include assert {
       @include output {
-        $lines: 2;
-        $width: 3px;
+        $width: 5px;
+        $lines: 8;
         $style: "dashed";
 
-        @include p-border-top($lines, $width, $style);
+        @include p-border-top($width, $lines, $style);
       }
 
       @include expect {
-        padding-top: 1.8125rem;
-        border-top: 0.1875rem dashed #ccc;
+        padding-top: 7.6875rem;
+        border-top: 0.3125rem dashed #ccc;
       }
     }
   }
 }
 
 @include test-module("p-border-bottom [mixin]") {
-  @include test("Should output leading border w/ new `$color` assigned value.") {
+  @include test("Should output trailing border and whitespace w/ new `$color` assigned value.") {
     @include assert {
       @include output {
-        $lines: 2;
-        $width: 3px;
+        $width: 13px;
+        $lines: 21;
         $color: #f00;
 
-        @include p-border-bottom($lines, $width, $color: $color);
+        @include p-border-bottom($width, $lines, $color: $color);
       }
 
       @include expect {
-        padding-bottom: 1.8125rem;
-        border-bottom: 0.1875rem solid #f00;
+        padding-bottom: 20.1875rem;
+        border-bottom: 0.8125rem solid #f00;
+      }
+    }
+  }
+}
+
+@include test-module("p-debug [mixin]") {
+  @include test("Should output background-image to debug vertical alignment.") {
+    @include assert {
+      @include output {
+        @include p-debug;
+      }
+
+      @include expect {
+        background-image: linear-gradient(to top, rgba(#f00, 0.2) 12.5%, transparent 12.5%), linear-gradient(to top, rgba(#f00, 0.6) 6.25%, transparent 6.25%);
+        background-position: top right;
+        background-size: 100% 0.5rem, 100% 1rem;
+      }
+    }
+  }
+
+  @include test("Should output background-image to debug vertical alignment w/ new `$color` assigned value.") {
+    @include assert {
+      @include output {
+        $color: rgba(#000, 0.9);
+
+        @include p-debug($color);
+      }
+
+      @include expect {
+        background-image: linear-gradient(to top, rgba(#000, 0.3) 12.5%, transparent 12.5%), linear-gradient(to top, rgba(#000, 0.9) 6.25%, transparent 6.25%);
+        background-position: top right;
+        background-size: 100% 0.5rem, 100% 1rem;
       }
     }
   }

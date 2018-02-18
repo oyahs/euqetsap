@@ -1,0 +1,11 @@
+{
+  "version": "0.0.7",
+  "author": "Zaza Agency <hi@zaza.africa> (zaza.africa)",
+  "license": "CC-BY-4.0",
+  "dependencies": {
+    "normalize.css": "^8.0.0",
+    "suitcss-base": "^4.0.0",
+    "suitcss-components-button": "^6.0.2",
+    "system-font-css": "^2.0.1"
+  }
+}
