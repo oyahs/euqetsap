@@ -26,7 +26,8 @@ const evres = () => {
 
   gulp.watch([
     `${dir.package}/**/*.scss`,
-    `${dir.demo}/*/**/*.scss`,
+    `!${dir.package}/node_modules/**/*.scss`,
+    `${dir.demo}/**/*.scss`,
     `!${dir.demo}/node_modules/**/*.scss`,
   ], style).on('change', () => bs.reload());
 };

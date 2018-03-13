@@ -1,6 +1,6 @@
 # pasteque
 
-###### 0.0.7
+###### 0.0.8
 
 Beautify typography.
 
@@ -15,7 +15,7 @@ $ npm install pasteque
 ### Usage
 
 ```scss
-@import "path/to/node_modules/pasteque/p";
+@import "path/to/node_modules/pasteque/pasteque";
 ```
 
 ### Author

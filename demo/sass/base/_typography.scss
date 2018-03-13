@@ -1,22 +1,21 @@
-@import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400");
-
 /* stylelint-disable selector-max-type */
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400");
 
 @include p-establish-baseline;
 
 .typography {
-  font-family: system-ui, sans-serif;
+  font-family: sans-serif;
 }
 
-.typography__debug {
+.debug {
   position: relative;
 }
 
-.typography__debug::after {
+.debug::after {
   position: absolute;
   top: 0;
   right: 0;
-  z-index: 9000;
+  z-index: 2000;
   display: none;
   width: 100%;
   height: 100%;
@@ -25,127 +24,30 @@
   @include p-debug($p-debug-color);
 }
 
-.typography__debug--active::after {
+.debug--active::after {
   display: block;
 }
 
-.typography--heading-1 {
-  margin-left: -0.07em;
-  font-weight: 400;
-  letter-spacing: -0.02em;
-  @include p-font-size(56px);
-  @include p-margin-top(-8px);
-  @include p-margin-bottom(64px);
+.typography__heading {
+  @include p-margin-top;
 }
 
-.typography--heading-1.typography--aligning-type-to-baseline {
-  margin-top: 0;
-  @include p-aligning-type-to-baseline(56px, $font--headings, $trailer: 64px);
-}
+@each $tag, $i, $margin-bottom, $typeface in ((".typography__heading--1", 3, 2, "heading"), (".typography__heading--2", 2, 1, "heading"), (".typography__heading--3", 1, 0, "heading"), (".typography__heading--4", 0, 0, "heading"), ((".typography__heading--5", ".typography__heading--6", "heading"), -1, 0, "heading"), (".typography__paragraph", 0, 1, $typeface--body),) {
+  #{$tag} {
+    @include p-font-size(ts($i));
+    @include p-margin-bottom($margin-bottom);
+  }
 
-.typography--heading-2 {
-  margin-left: -0.07em;
-  font-weight: 400;
-  @include p-font-size(45px);
-  @include p-margin-top(-8px);
-  @include p-margin-bottom(64px);
-}
-
-.typography--heading-2.typography--aligning-type-to-baseline {
-  margin-top: 0;
-  @include p-aligning-type-to-baseline(45px, $font--headings, $trailer: 64px);
-}
-
-.typography--heading-3 {
-  margin-left: -0.07em;
-  font-weight: 400;
-  @include p-font-size(34px);
-  @include p-margin-top(-8px);
-  @include p-margin-bottom(64px);
-}
-
-.typography--heading-3.typography--aligning-type-to-baseline {
-  margin-top: 0;
-  @include p-aligning-type-to-baseline(34px, $font--headings, $trailer: 64px);
-}
-
-.typography--heading-4 {
-  margin-left: -0.06em;
-  font-weight: 400;
-  @include p-font-size(24px);
-  @include p-margin-top(-8px);
-  @include p-margin-bottom(16px);
-}
-
-.typography--heading-4.typography--aligning-type-to-baseline {
-  margin-top: 0;
-  @include p-aligning-type-to-baseline(24px, $font--headings, $trailer: 16px);
-}
-
-.typography--heading-5 {
-  margin-left: -0.05em;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  @include p-font-size(20px);
-  @include p-margin-top(-8px);
-  @include p-margin-bottom(16px);
-}
-
-.typography--heading-5.typography--aligning-type-to-baseline {
-  margin-top: 0;
-  @include p-aligning-type-to-baseline(20px, $font--headings, $trailer: 16px);
-}
-
-.typography--heading-6 {
-  margin-left: -0.06em;
-  font-weight: 400;
-  letter-spacing: 0.04em;
-  @include p-font-size(16px);
-  @include p-margin-top(-8px);
-  @include p-margin-bottom(16px);
-}
-
-.typography--heading-6.typography--aligning-type-to-baseline {
-  margin-top: 0;
-  @include p-aligning-type-to-baseline(16px, $font--headings, $trailer: 16px);
-}
-
-.typography--heading-1,
-.typography--heading-2,
-.typography--heading-3,
-.typography--heading-4,
-.typography--heading-5,
-.typography--heading-6 {
-  &.typography--aligning-type-to-baseline {
-    font-family: map-get($font--headings, "family");
-    font-style: unquote(map-get($font--headings, "style"));
-    font-weight: map-get($font--headings, "weight");
+  @each $t in $tag {
+    #{$t}.typography--aligning-type-to-baseline {
+      @include p-aligning-type-to-baseline(ts($i), $typeface, $trailer: $margin-bottom);
+      @include p-fonteque-get($typeface);
+    }
   }
 }
 
-.typography--paragraph,
-.typography--unordered-list,
-.typography--ordered-list,
-.typography--preformatted,
-.typography--table,
-.typography--blockquote {
-  font-weight: 400;
-  letter-spacing: 0.04em;
-  @include p-font-size(14px);
-  @include p-margin-top(-4px);
-  @include p-margin-bottom(12px);
-
-  &.typography--aligning-type-to-baseline {
-    margin-top: 0;
-    font-family: map-get($font--body, "family");
-    font-style: unquote(map-get($font--body, "style"));
-    font-weight: map-get($font--body, "weight");
-    @include p-aligning-type-to-baseline(14px, $font--body, $trailer: 12px);
-  }
-}
-
-ul,
-ol {
+.typography__paragraph--unordered-list,
+.typography__paragraph--ordered-list {
   & & {
     margin-top: 0;
     margin-bottom: 0;
@@ -155,7 +57,6 @@ ol {
 hr {
   width: 100%;
   height: 0;
-  padding: 0;
   margin: 0;
   clear: both;
   border: 0;

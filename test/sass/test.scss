@@ -1,10 +1,13 @@
 // Vendor
+//noinspection CssUnknownTarget
 @import "true";
 
 // Package
-@import "package/unit/u";
-@import "package/all/a";
+//noinspection CssUnknownTarget
+@import "package/unit/unit";
+//noinspection CssUnknownTarget
+@import "package/all/all";
 
-@import "u";
-@import "p";
-@import "a";
+@import "unit";
+@import "pasteque";
+@import "all";

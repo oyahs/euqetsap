@@ -1,6 +1,6 @@
 # pasteque-all
 
-###### 0.0.7
+###### 0.0.8
 
 Beautify typography:
 * Aligning to baseline.
@@ -14,7 +14,7 @@ $ npm install pasteque-all
 ### Usage
 
 ```scss
-@import "path/to/node_modules/pasteque-all/a";
+@import "path/to/node_modules/pasteque-all/all";
 ```
 
 ### Author

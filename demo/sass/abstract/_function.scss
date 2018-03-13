@@ -1,0 +1,16 @@
+@function ts($i: 0, $base: $ts-base, $ratio: $ts-ratio) {
+  $i: round($i);
+
+  @if ($i > 0) {
+    @for $j from 1 through $i {
+      $base: $base * $ratio;
+    }
+  }
+  @else if ($i < 0) {
+    @for $k from 1 through abs($i) {
+      $base: $base / $ratio;
+    }
+  }
+
+  @return round($base);
+}

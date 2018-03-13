@@ -1,7 +1,7 @@
 //
 // pasteque-unit
 //
-// 0.0.7
+// 0.0.8
 //
 // Beautify typography:
 // Unit.
@@ -37,7 +37,7 @@ $p-unit-global: "rem" !default;
 /// @author Compass
 /// @link http://compass-style.org/reference/compass/typography/
 /// @type Bool
-$p-unit__rem--w-fallback: false !default;
+$p-unit-rem--w-fallback: false !default;
 
 /// Convert any CSS `length` or `percentage` value to any another.
 /// @author Compass
@@ -206,8 +206,8 @@ $p-unit__rem--w-fallback: false !default;
 /// @link http://compass-style.org/reference/compass/typography/
 /// @parameter {String} $property - Css property name.
 /// @parameter {List|Number} $value - Value or list of values for the property.
-/// @parameter {Bool} $fallback [$p-unit__rem--w-fallback] - Use px fallback.
-@mixin p-unit-rem($property, $value, $fallback: $p-unit__rem--w-fallback) {
+/// @parameter {Bool} $fallback [$p-unit-rem--w-fallback] - Use px fallback.
+@mixin p-unit-rem($property, $value, $fallback: $p-unit-rem--w-fallback) {
   $eulav: p-unit-px-rem($value);
   $px-value: map-get($eulav, "px");
   $rem-value: map-get($eulav, "rem");

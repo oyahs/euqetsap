@@ -1,6 +1,6 @@
 # pasteque-unit
 
-###### 0.0.7
+###### 0.0.8
 
 Beautify typography:
 * Unit.
@@ -16,7 +16,7 @@ $ npm install pasteque-unit
 ### Usage
 
 ```scss
-@import "path/to/node_modules/pasteque-unit/u";
+@import "path/to/node_modules/pasteque-unit/unit";
 ```
 
 ### Author

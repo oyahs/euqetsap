@@ -1,0 +1,28 @@
+.navigation__menu::before,
+.navigation__menu::after {
+  display: table;
+  content: " ";
+}
+
+.navigation__menu::after {
+  clear: both;
+}
+
+.navigation__menu li { // stylelint-disable-line selector-max-type
+  display: block;
+  float: left;
+}
+
+.menu__king {
+  display: block;
+  padding-right: 0.75em;
+  padding-left: 0.75em;
+  color: #5500f4;
+  text-decoration: none;
+  transition: color 0.15s;
+  @include p-font-size(ts(0), 3);
+}
+
+.menu__king:hover {
+  color: #60008e;
+}

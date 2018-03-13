@@ -11,7 +11,8 @@ const lp = loadPlugins();
 const sass = () => {
   return gulp.src([
     `${dir.package}/**/*.scss`,
-    `${dir.demo}/*/**/*.scss`,
+    `!${dir.package}/node_modules/**/*.scss`,
+    `${dir.demo}/**/*.scss`,
     `!${dir.demo}/node_modules/**/*.scss`,
   ]).pipe(lp.sass(task.style.sass.options).on('error', lp.sass.logError)).pipe(gulp.dest(dir.tmp));
 };
@@ -19,7 +20,8 @@ const sass = () => {
 const lint = () => {
   return gulp.src([
     `${dir.package}/**/*.scss`,
-    `${dir.demo}/*/**/*.scss`,
+    `!${dir.package}/node_modules/**/*.scss`,
+    `${dir.demo}/**/*.scss`,
     `!${dir.demo}/node_modules/**/*.scss`,
   ]).pipe(lp.postcss());
 };
