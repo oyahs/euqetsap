@@ -1,10 +1,3 @@
-:root {
-  --Grid-gutter-size: 16px;
-  --Button-border-width: 0;
-  --Button-disabled-opacity: 0.6;
-  --Button-padding: 0 0.75em;
-}
-
 html { // stylelint-disable-line selector-max-type
   width: 100%;
   height: 100%;
@@ -15,6 +8,7 @@ html { // stylelint-disable-line selector-max-type
 body { // stylelint-disable-line selector-max-type
   width: 100%;
   min-height: 100%;
+  margin: 0;
 }
 
 main { // stylelint-disable-line selector-max-type

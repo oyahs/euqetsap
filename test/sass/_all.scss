@@ -1,0 +1,267 @@
+//
+// pasteque-all
+//
+// 0.0.8
+//
+// Beautify typography:
+// Aligning to baseline.
+//
+// Zaza Agency <hi@zaza.africa> (zaza.africa)
+//
+// This work is licensed under the Creative Commons
+// Attribution 4.0 International License. To view a copy
+// of this license, visit http://creativecommons.org/licenses/by/4.0/.
+//
+
+@mixin before-test-aligning {
+  $_p-typeface-eg: (
+    "family": ("Open Sans", sans-serif),
+    "style": "normal",
+    "weight": 400,
+    "cap-height": 0.72em,
+  ) !global;
+
+  @include p-fonteque-set("test", $_p-typeface-eg);
+}
+
+@include before-test-aligning;
+
+@include test-module("p-shift-value [function]") {
+  @include test("Should return distance to shift text down.") {
+    $to: 144px;
+    $cap-height: 0.72em;
+    $output: p-shift-value($to, $cap-height);
+    $expect: 1.26rem;
+
+    @include assert-equal($output, $expect);
+  }
+}
+
+@include test-module("p-fonteque-get [mixin]") {
+  @include test("Should output chosen font specs from `$p-fonteque`.") {
+    @include assert {
+      @include output {
+        $typeface: "test";
+
+        @include p-fonteque-get($typeface);
+      }
+
+      @include expect {
+        font-family: "Open Sans", sans-serif;
+        font-style: normal;
+        font-weight: 400;
+      }
+    }
+  }
+
+  @include test("Should output chosen font specs from new assigned map specs.") {
+    @include assert {
+      @include output {
+        @include p-fonteque-get($_p-typeface-eg);
+      }
+
+      @include expect {
+        font-family: "Open Sans", sans-serif;
+        font-style: normal;
+        font-weight: 400;
+      }
+    }
+  }
+
+  @include test("Should check if font exists in `$p-fonteque` and output fallback specs.") {
+    @include assert {
+      @include output {
+        $typeface: "does-not-exist";
+
+        @include p-fonteque-get($typeface, $_p-typeface-eg);
+      }
+
+      @include expect {
+        font-family: "Open Sans", sans-serif;
+        font-style: normal;
+        font-weight: 400;
+      }
+    }
+  }
+}
+
+@include test-module("p-padding-top-to-move-text-down [mixin]") {
+  @include test("Should output correct padding-top relative to selected font `$p-fonteque` to move the text downwards.") {
+    @include assert {
+      @include output {
+        $to: 144px;
+        $typeface: "test";
+
+        @include p-padding-top-to-move-text-down($to, $typeface);
+      }
+
+      @include expect {
+        padding-top: 1.26rem;
+      }
+    }
+  }
+
+  @include test("Should output correct padding-top relative to assigned typeface map specs to move the text downwards.") {
+    @include assert {
+      @include output {
+        $to: 144px;
+        $typeface: $_p-typeface-eg;
+
+        @include p-padding-top-to-move-text-down($to, $typeface);
+      }
+
+      @include expect {
+        padding-top: 1.26rem;
+      }
+    }
+  }
+
+  @include test("Should output correct padding-top to move the text downwards w/ new assigned `$lines` value.") {
+    @include assert {
+      @include output {
+        $to: 144px;
+        $typeface: "test";
+        $lines: 3;
+
+        @include p-padding-top-to-move-text-down($to, $typeface, $lines);
+      }
+
+      @include expect {
+        padding-top: 3.26rem;
+      }
+    }
+  }
+}
+
+@include test-module("p-trailing-whitespace-to-keep-rhythm [mixin]") {
+  @include test("Should output correct trailing whitespace as margin relative to selected font `$p-fonteque` to maintain rhythm.") {
+    @include assert {
+      @include output {
+        $to: 144px;
+        $typeface: "test";
+
+        @include p-trailing-whitespace-to-keep-rhythm($to, $typeface);
+      }
+
+      @include expect {
+        margin-bottom: 1.74rem;
+      }
+    }
+  }
+
+  @include test("Should output correct trailing whitespace as margin relative to assigned typeface map specs to maintain rhythm.") {
+    @include assert {
+      @include output {
+        $to: 144px;
+        $typeface: $_p-typeface-eg;
+
+        @include p-trailing-whitespace-to-keep-rhythm($to, $typeface);
+      }
+
+      @include expect {
+        margin-bottom: 1.74rem;
+      }
+    }
+  }
+
+  @include test("Should output correct trailing whitespace as padding w/ new assigned `$lines` value.") {
+    @include assert {
+      @include output {
+        $to: 144px;
+        $typeface: "test";
+        $lines: 3;
+        $property: "padding";
+
+        @include p-trailing-whitespace-to-keep-rhythm($to, $typeface, $lines, $property);
+      }
+
+      @include expect {
+        padding-bottom: 2.74rem;
+      }
+    }
+  }
+}
+
+@include test-module("p-aligning-type-to-baseline [mixin]") {
+  @include test("Should output padding-top to move text downwards and margin-bottom to maintain rhythm. `$p-fonteque`'s test.") {
+    @include assert {
+      @include output {
+        $to: 14px;
+        $typeface: "test";
+
+        @include p-aligning-type-to-baseline($to, $typeface);
+      }
+
+      @include expect {
+        padding-top: 0.685rem;
+        margin-bottom: 0.315rem;
+        font-size: 0.875rem;
+        line-height: 2rem;
+
+        & + * {
+          margin-top: 0;
+        }
+      }
+    }
+  }
+
+  @include test("Should output padding-top to move text downwards and margin-bottom to maintain rhythm. Assigned typeface map specs's test.") {
+    @include assert {
+      @include output {
+        $to: 14px;
+        $typeface: "test";
+
+        @include p-aligning-type-to-baseline($to, $typeface);
+      }
+
+      @include expect {
+        padding-top: 0.685rem;
+        margin-bottom: 0.315rem;
+        font-size: 0.875rem;
+        line-height: 2rem;
+
+        & + * {
+          margin-top: 0;
+        }
+      }
+    }
+  }
+}
+
+@include test-module("p-adjust-component-horizontal-padding [mixin]") {
+  @include test("Should output padding-top to move text downwards and margin-bottom to maintain rhythm. `$p-fonteque`'s test.") {
+    @include assert {
+      @include output {
+        $to: 14px;
+        $typeface: "test";
+
+        @include p-adjust-component-horizontal-padding($to, $typeface);
+      }
+
+      @include expect {
+        padding-top: 0.685rem;
+        padding-bottom: 0.315rem;
+        font-size: 0.875rem;
+        line-height: 2rem;
+      }
+    }
+  }
+
+  @include test("Should output padding-top to move text downwards and margin-bottom to maintain rhythm. Assigned typeface map specs's test.") {
+    @include assert {
+      @include output {
+        $to: 14px;
+        $typeface: "test";
+
+        @include p-adjust-component-horizontal-padding($to, $typeface);
+      }
+
+      @include expect {
+        padding-top: 0.685rem;
+        padding-bottom: 0.315rem;
+        font-size: 0.875rem;
+        line-height: 2rem;
+      }
+    }
+  }
+}

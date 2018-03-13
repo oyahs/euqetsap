@@ -1,16 +1,16 @@
-$grid--gutter: 16px;
-$grid--column: ("count": 12, "width": 72px);
+$ts-base: 16px;
+$ts-ratio: 1.5;
 
-$font--headings: (
+@include p-fonteque-set("heading", (
   "family": ("Open Sans", sans-serif),
+  "style": "normal",
   "weight": 300,
-  "style": "normal",
   "cap-height": 0.72em
-);
+));
 
-$font--body: (
+$typeface--body: (
   "family": ("Open Sans", sans-serif),
-  "weight": 400,
   "style": "normal",
+  "weight": 400,
   "cap-height": 0.72em
 );

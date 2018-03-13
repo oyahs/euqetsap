@@ -1,0 +1,289 @@
+//
+// pasteque-all
+//
+// 0.0.8
+//
+// Beautify typography:
+// Aligning to baseline.
+//
+// Zaza Agency <hi@zaza.africa> (zaza.africa)
+//
+// This work is licensed under the Creative Commons
+// Attribution 4.0 International License. To view a copy
+// of this license, visit http://creativecommons.org/licenses/by/4.0/.
+//
+
+// @import "../pasteque/pasteque";
+@import "../typography/pasteque";
+
+////
+//// @author Zaza Agency <hi@zaza.africa> (zaza.africa)
+////
+
+/// Pasteque fonts.
+/// @access private
+/// @type List|Map
+$p-fonteque: () !global;
+
+/// Pasteque typeface example specs map.
+/// @access private
+/// @type Map
+$_p-typeface-eg: (
+  "family": ("Open Sans", sans-serif),
+  "style": "normal",
+  "weight": 400,
+  "cap-height": 0.72em,
+) !global;
+
+/// Calculate distance to shift text down.
+/// @access private
+/// @example
+///   p-shift-value(14px, 0.72em);
+/// @link https://medium.com/written-in-code/aligning-type-to-baseline-the-right-way-using-sass-e258fce47a9b
+/// @parameter {Number} $to
+/// @parameter {Number} $cap-height
+/// @parameter {Number} $from [null]
+/// @return {Number} Distance to shift text down.
+@function p-shift-value($to, $cap-height, $from: null) {
+  @if (type-of($from) != "number") {
+    $from: map-get(map-get($_PSTQ_, "UNIT"), "BROWSER_DEFAULT_FONT_SIZE");
+  }
+
+  $to: p-unit-convert($to, "px", $from);
+  $lines: p-lines-for($to);
+  $to: p-unit-convert($to, $p-unit-global, $from);
+  $line-height: p-rhythm($lines, 0, $from);
+  $cap-height: p-unit-convert($cap-height, $p-unit-global, $from);
+  $from: p-unit-convert($from, $p-unit-global, $from);
+  $_return: $to / 2 * ($line-height * $from / $to - $cap-height) / $from;
+
+  @if (unit($_return) == "px") {
+    $_return: floor($_return);
+  }
+
+  @return $_return;
+}
+
+/// Check assigned typeface specs map.
+/// @example
+///   @include p-typeface-specs-error-handler(("family": ("Open Sans", sans-serif), "cap-height": 0.72em));
+/// @example
+///   @include p-typeface-specs-error-handler(("family": ("Open Sans", sans-serif), "cap-height": 0.72em), "fonteque-s-typeface");
+/// @output ø
+/// @parameter {Map} $value - Typeface specs map.
+/// @parameter {Null|String} $key [null] - Typeface name.
+@mixin p-typeface-specs-error-handler($value, $key: null) {
+  @if (type-of($value) != "map") {
+    @error "#{if(type-of($key) == "string", "#{$key}\'s t", "T")}ypeface specs must be a map! Non-exhaustive keys example: #{map-keys($_p-typeface-eg)}.";
+  }
+
+  @if (not map-has-key($value, "cap-height")) {
+    @error "#{if(type-of($key) == "string", "#{$key}\'s t", "T")}ypeface must have a correct `cap-height` value! Non-exhaustive keys example: #{map-keys($_p-typeface-eg)}.";
+  }
+
+  $cap-height: map-get($value, "cap-height");
+
+  @if (type-of($cap-height) != "number") {
+    @error "#{if(type-of($key) == "string", "#{$key}\'s t", "T")}ypeface must have a correct `cap-height` value: (unitless or in em) number less than one.";
+  }
+
+  @if unitless($cap-height) {
+    @if ($cap-height >= 1) {
+      @error "#{if(type-of($key) == "string", "#{$key}\'s t", "T")}ypeface must have a correct `cap-height` value: (unitless or in em) number less than one.";
+    }
+  }
+  @else {
+    @if (unit($cap-height) != "em") {
+      @error "#{if(type-of($key) == "string", "#{$key}\'s t", "T")}ypeface must have a correct `cap-height` value: (unitless or in em) number less than one.";
+    }
+
+    @if ($cap-height >= 1) {
+      @error "#{if(type-of($key) == "string", "#{$key}\'s t", "T")}ypeface must have a correct `cap-height` value: (unitless or in em) number less than one.";
+    }
+  }
+}
+
+/// Fonts setter.
+/// @example
+///   @include p-fonteque-set("fonteque-s-typeface", ("family": ("Open Sans", sans-serif), "cap-height": 0.72em));
+/// @link https://www.sitepoint.com/dealing-constants-sass/
+/// @output ø
+/// @parameter {String} $key - Typeface name.
+/// @parameter {Map} $value - Typeface specs map.
+@mixin p-fonteque-set($key, $value) {
+  @if (map-has-key($p-fonteque, $key)) {
+    @error "#{$key}'s typeface already defined!";
+  }
+
+  @include p-typeface-specs-error-handler($value, $key);
+
+  $p-fonteque: map-merge($p-fonteque, ($key: $value)) !global;
+}
+
+/// Fonts getter.
+/// @example
+///   @include p-fonteque-get("fonteque-s-typeface");
+/// @example
+///   @include p-fonteque-get("does-not-exist", ("Open Sans", sans-serif), "style": "normal"));
+/// @example
+///   @include p-fonteque-get(("Open Sans", sans-serif), "style": "normal"));
+/// @parameter {Map|Null|String} $key [null]
+/// @parameter {Map|Null} $fallback [null] - Fallback specs map.
+@mixin p-fonteque-get($key: null, $fallback: null) {
+  @if map-has-key($p-fonteque, $key) {
+    $key: map-get($p-fonteque, $key);
+  }
+
+  $specs: if(type-of($fallback) == "map", $fallback, ());
+
+  @if (type-of($key) == "map") {
+    $specs: map-merge($specs, $key);
+  }
+
+  @each $property, $value in $specs {
+    @if (index(("family", "style", "weight"), $property) != null) {
+      #{unquote("font-#{$property}")}: if(type-of($value) == "string", unquote($value), $value);
+    }
+  }
+}
+
+/// Apply leading whitespace as padding to move text downwards.
+/// @example
+///   @include p-padding-top-to-move-text-down(14px, $typeface);
+/// @example
+///   @include p-padding-top-to-move-text-down(14px, "fonteque-s-typeface", 2);
+/// @link https://medium.com/written-in-code/aligning-type-to-baseline-the-right-way-using-sass-e258fce47a9b
+/// @parameter {Number} $to
+/// @parameter {Map|String} $typeface [$_p-typeface-eg] - Typeface.
+/// @parameter {Number} $lines [0] - Multiples of baseline rhythm to apply as leading padding.
+/// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
+@mixin p-padding-top-to-move-text-down($to, $typeface: $_p-typeface-eg, $lines: 0, $from: null) {
+  @if (type-of($typeface) == "string") {
+    @if map-has-key($p-fonteque, $typeface) {
+      $typeface: map-get($p-fonteque, $typeface);
+    }
+    @else {
+      @error "Unknown `#{$typeface}`'s typeface!";
+    }
+  }
+  @else {
+    @include p-typeface-specs-error-handler($typeface);
+  }
+
+  $cap-height: map-get($typeface, "cap-height");
+
+  @if unitless($cap-height) {
+    $cap-height: $cap-height * 1em;
+  }
+
+  $shift-value: p-shift-value($to, $cap-height, $from);
+
+  @if (not unitless($lines)) {
+    $lines: _p-lines-for(p-unit-convert($lines, "px", $from));
+  }
+
+  @if ($lines > 0) {
+    $lines: ceil($lines - 1);
+  }
+
+  $leader: p-rhythm($lines, 0, $from);
+
+  @include p-unit-rem("padding-top", $shift-value + $leader);
+}
+
+/// Apply trailing whitespace to maintain rhythm.
+/// @example
+///   @include p-trailing-whitespace-to-keep-rhythm(14px, $typeface);
+/// @example
+///   @include p-trailing-whitespace-to-keep-rhythm(14px, "fonteque-s-typeface", $property: "padding");
+/// @example
+///   @include p-trailing-whitespace-to-keep-rhythm(14px, "fonteque-s-typeface", 2);
+/// @link https://medium.com/written-in-code/aligning-type-to-baseline-the-right-way-using-sass-e258fce47a9b
+/// @parameter {Number} $to
+/// @parameter {Map|String} $typeface [$_p-typeface-eg] - Typeface.
+/// @parameter {Number} $lines [0] - Multiples of baseline rhythm to apply as trailing whitespace.
+/// @parameter {String} $property ["margin"] - Can be margin or padding.
+/// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
+@mixin p-trailing-whitespace-to-keep-rhythm($to, $typeface: $_p-typeface-eg, $lines: 0, $property: "margin", $from: null) {
+  @if (type-of($typeface) == "string") and map-has-key($p-fonteque, $typeface) {
+    @if map-has-key($p-fonteque, $typeface) {
+      $typeface: map-get($p-fonteque, $typeface);
+    }
+    @else {
+      @error "Unknown `#{$typeface}`'s typeface!";
+    }
+  }
+  @else {
+    @include p-typeface-specs-error-handler($typeface);
+  }
+
+  $cap-height: map-get($typeface, "cap-height");
+
+  @if unitless($cap-height) {
+    $cap-height: $cap-height * 1em;
+  }
+
+  $_shift-value: p-shift-value($to, $cap-height, $from);
+  $reference: p-rhythm(1, 0, $from);
+  $_lines: 0;
+
+  @if (not unitless($lines)) {
+    $lines: _p-lines-for(p-unit-convert($lines, "px", $from));
+  }
+
+  $_trailer: p-rhythm($lines, 0, $from);
+
+  @if ($_shift-value > ($_trailer + $reference)) {
+    $_lines: _p-lines-for(p-unit-convert($_shift-value, "px", $from));
+  }
+
+  $trailer: p-rhythm(($lines + $_lines + 1), 0, $from);
+  $shift-value: $trailer - $_shift-value; // stylelint-disable-next-line no-eol-whitespace
+
+  @include p-unit-rem("#{$property}-bottom", $shift-value);
+
+  @if ($property == "margin") and ($reference > $shift-value) {
+    & + * { // stylelint-disable-line scss/selector-no-redundant-nesting-selector
+      margin-top: 0;
+    }
+  }
+}
+
+/// Aligning type to baseline.
+/// @example
+///   @include p-aligning-type-to-baseline(14px, $typeface);
+/// @example
+///   @include p-aligning-type-to-baseline(14px, "fonteque-s-typeface");
+/// @example
+///   @include p-aligning-type-to-baseline(14px, "fonteque-s-typeface", 2);
+/// @example
+///   @include p-aligning-type-to-baseline(14px, "fonteque-s-typeface", 2, 3);
+/// @link https://medium.com/written-in-code/aligning-type-to-baseline-the-right-way-using-sass-e258fce47a9b
+/// @parameter {Number} $to
+/// @parameter {Map|String} $typeface [$_p-typeface-eg] - Typeface.
+/// @parameter {Number} $leader [0] - Multiples of baseline rhythm to apply as leading padding.
+/// @parameter {Number} $trailer [$leader] - Multiples of baseline rhythm to apply as trailing margin.
+/// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
+@mixin p-aligning-type-to-baseline($to, $typeface: $_p-typeface-eg, $leader: 0, $trailer: $leader, $from: null) {
+  @include p-padding-top-to-move-text-down($to, $typeface, $leader, $from);
+  @include p-trailing-whitespace-to-keep-rhythm($to, $typeface, $trailer, "margin", $from);
+  @include p-font-size($to, $from: $from);
+}
+
+/// Adjust component horizontal whitespaces.
+/// @example
+///   @include p-adjust-component-horizontal-padding(14px, $typeface);
+/// @example
+///   @include p-adjust-component-horizontal-padding(14px, "fonteque-s-typeface");
+/// @example
+///   @include p-adjust-component-horizontal-padding(14px, "fonteque-s-typeface", 2);
+/// @link https://medium.com/written-in-code/aligning-type-to-baseline-the-right-way-using-sass-e258fce47a9b
+/// @parameter {Number} $to
+/// @parameter {Map|String} $typeface [$_p-typeface-eg] - Typeface.
+/// @parameter {Number} $lines [0] - Multiples of baseline rhythm to apply for top and bottom padding.
+/// @parameter {Null|Number} $from [null] - Adjust from a font-size other than the base font-size.
+@mixin p-adjust-component-horizontal-padding($to, $typeface: $_p-typeface-eg, $lines: 0, $from: null) {
+  @include p-padding-top-to-move-text-down($to, $typeface, $lines, $from);
+  @include p-trailing-whitespace-to-keep-rhythm($to, $typeface, $lines, "padding", $from);
+  @include p-font-size($to, $from: $from);
+}

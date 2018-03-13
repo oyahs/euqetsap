@@ -1,6 +1,6 @@
 # 🍉 pasteque
 
-###### 0.0.7
+###### 0.0.8
 
 Pasteque's modules repository.
 
