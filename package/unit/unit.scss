@@ -1,7 +1,7 @@
 //
 // pasteque-unit
 //
-// 0.0.8
+// 0.1.0
 //
 // Beautify typography:
 // Unit.
@@ -52,6 +52,10 @@ $p-unit-rem--w-fallback: false !default;
 /// @return {Number} New converted length.
 @function p-unit-convert($length, $unit, $from: null) {
   $length-unit: unit($length);
+
+  @if ($length == 0) {
+    @return $length / ($length * 0 + 1);
+  }
 
   @if ($length-unit == $unit) {
     @return $length;

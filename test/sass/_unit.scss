@@ -1,7 +1,7 @@
 //
 // pasteque-unit
 //
-// 0.0.8
+// 0.1.0
 //
 // Beautify typography:
 // Unit.
@@ -25,6 +25,15 @@
 @include before-test-unit;
 
 @include test-module("p-unit-convert [function]") {
+  @include test("Should return length-zero-no-unit.") {
+    $length: 0px; // stylelint-disable-line length-zero-no-unit
+    $unit: "em";
+    $output: p-unit-convert($length, $unit);
+    $expect: 0;
+
+    @include assert-equal($output, $expect);
+  }
+
   @include test("Should return new converted value relative to root font-size.") {
     $length: 1px;
     $unit: "rem";
