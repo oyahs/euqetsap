@@ -1,6 +1,6 @@
 # pasteque
 
-###### 0.0.8
+###### 0.1.0
 
 Beautify typography.
 
